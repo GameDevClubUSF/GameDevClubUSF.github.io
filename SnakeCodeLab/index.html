@@ -1,0 +1,403 @@
+
+<!doctype html>
+
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>Snake In Python using Pygames</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+  <google-codelab codelab-gaid=""
+                  codelab-ga4id=""
+                  id="SnakeCodeLab"
+                  title="Snake In Python using Pygames"
+                  environment="web"
+                  feedback-link="">
+    
+      <google-codelab-step label="Overview" duration="2">
+        <p>Learn Python <br> Learn about Pygames <br> Use Python def classes to make a functional game</p>
+<h2 is-upgraded>Table of Content</h2>
+<ol type="1">
+<li>Setup Python and pygames</li>
+<li>Create Screen and grid</li>
+<li>Create Snake</li>
+<li>Give Snake inputs</li>
+<li>Create Apple</li>
+<li>Death and Scoring</li>
+</ol>
+<h2 is-upgraded>Image of final product</h2>
+<p class="image-container"><img alt="Snake Image Caption" src="img\\d4eed817655cb3b8.jpg"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Pre-req: Getting Python and Pygames" duration="7">
+        <p>Download Python and install Pygames</p>
+<h2 is-upgraded>Get VS Code, Python and Pygames</h2>
+<p>Get Visual Studio Code because why use any other IDEs <a href="https://code.visualstudio.com/download" target="_blank">Download VS Code</a><br></p>
+<p>Get Python from Python website, <a href="https://www.python.org/downloads/" target="_blank">Click Here!</a></p>
+<p>To install Pygame, in terminal enter <br> For Windows <code>py -m pip install -U pygame --user</code><br> For Mac <code>python3 -m pip install -U pygame --user</code></p>
+<h2 is-upgraded>Check if they are installed correctly</h2>
+<p>Check Python <br> _ For Windows: <code>py --version</code><br> _ For Mac: <code>python3 --version</code></p>
+<p>Check Pygame: <code>pip show pygame</code></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Creating Screen and Grid" duration="7">
+        <h2 is-upgraded>Pygame Boilerplate</h2>
+<pre><code>import pygame as pg
+import sys
+import random
+import time
+
+pg.init()
+
+SW, SH = 800, 800
+
+BLOCK_SIZE = 50;
+FONT = pg.font.Font(&#34;Satoshi-Variable.ttf&#34;, BLOCK_SIZE*2)
+
+screen = pg.display.set_mode((SW,SH))
+pg.display.set_caption(&#34;Snake&#34;)
+clock = pg.time.Clock()
+
+While True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+        pygame.display.update()
+        clock.tick(10)      # delay in ms
+</code></pre>
+<h2 is-upgraded>Creating a grid</h2>
+<pre><code>def drawGrid():                                        # Nested for loop that draws grid
+    for x in range(0, SW, BLOCK_SIZE):
+        for y in range(0, SH, BLOCK_SIZE):
+            rect = pygame.Rect(x,y,BLOCK_SIZE, BLOCK_SIZE)
+            pygame.draw.rect(screen, &#34;#3c3c3b&#34;, rect, 1)
+</code></pre>
+<h2 is-upgraded>Calling drawGrid()</h2>
+<pre><code>def drawGrid():                                        # Nested for loop that draws grid
+    for x in range(0, SW, BLOCK_SIZE):
+        for y in range(0, SH, BLOCK_SIZE):
+            rect = pygame.Rect(x,y,BLOCK_SIZE, BLOCK_SIZE)
+            pygame.draw.rect(screen, &#34;#3c3c3b&#34;, rect, 1)
+
+drawGrid()
+
+While True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Making The Snake" duration="10">
+        <h2 is-upgraded>Create a new Snake object</h2>
+<pre><code>class Snake:
+    def __init__(self):
+        self.x, self.y = int((SW/4)/BLOCK_SIZE) * BLOCK_SIZE, int((SH/2)/BLOCK_SIZE) * BLOCK_SIZE
+        self.xdir = 1   # -1 Left   0 no move   1 Right
+        self.ydir = 0   # 1 Down   0 no move   -1 Up
+        self.head = pygame.Rect(self.x, self.y, BLOCK_SIZE, BLOCK_SIZE)
+        self.body = [pygame.Rect(self.x - BLOCK_SIZE, self.y, BLOCK_SIZE, BLOCK_SIZE)]
+        self.dead = False
+</code></pre>
+<p>When initializing a new Snake head object that is facing right on spawn at the center of the screen <br></p>
+<h2 is-upgraded>Drawing the object on the game screen</h2>
+<p>First initialize snake object with ‘snake = Snake()&#39;</p>
+<pre><code>drawGrid()
+snake = Snake()
+
+While True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+        # New Code HERE
+        pygame.draw.rect(screen, &#34;green&#34;, snake.head)
+
+        for square in snake.body:
+            pygame.draw.rect(screen, &#34;green&#34;, square)
+        # New Code END
+
+        pygame.display.update()
+        clock.tick(10)      # delay in ms
+</code></pre>
+<h2 is-upgraded>Updating the snake</h2>
+<pre><code>def update(self):
+    self.body.append(self.head)
+    for i in range(len(self.body)-1):
+        self.body[i].x = self.body[i+1].x
+        self.body[i].y = self.body[i+1].y
+
+    self.head.x += self.xdir * BLOCK_SIZE
+    self.head.y += self.ydir * BLOCK_SIZE
+
+    self.body.remove(self.head)
+</code></pre>
+<p>This update method goes in the Snake class</p>
+<h2 is-upgraded>Calling the update</h2>
+<pre><code>While True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+        snake.update()      # New Code HERE
+
+        pygame.draw.rect(screen, &#34;green&#34;, snake.head)
+
+        for square in snake.body:
+            pygame.draw.rect(screen, &#34;green&#34;, square)
+
+        pygame.display.update()
+        clock.tick(10)      # delay in ms
+</code></pre>
+<h2 is-upgraded>Erasing old snake and redrawing grid</h2>
+<pre><code>    if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+    snake.update()
+    # New Code HERE
+    screen.fill(&#34;black&#34;)
+    drawGrid()
+    # New Code END
+
+    pygame.draw.rect(screen, &#34;green&#34;, snake.head)
+
+    for square in snake.body:
+        pygame.draw.rect(screen, &#34;green&#34;, square)
+
+    pygame.display.update()
+    clock.tick(10)      # delay in ms
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Player Input" duration="7">
+        <h2 is-upgraded>Getting inputs from pygame</h2>
+<pre><code>while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+    # NEW CODE HERE
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_DOWN:
+                snake.ydir = 1
+                snake.xdir = 0
+            elif event.key == pygame.K_UP:
+                snake.ydir = -1
+                snake.xdir = 0
+            elif event.key == pygame.K_RIGHT:
+                snake.ydir = 0
+                snake.xdir = 1
+            elif event.key == pygame.K_LEFT:
+                snake.ydir = 0
+                snake.xdir = -1
+    # NEW CODE END
+</code></pre>
+<h2 is-upgraded>Solving glitches</h2>
+<pre><code># NEW CODE HERE
+input_cooldown = 0.01
+last_input_time = time.time()
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+        if event.type == pygame.KEYDOWN:
+            current_time = time.time()                                          # NEW CODE HERE
+            if current_time - last_input_time &gt; input_cooldown:                 # NEW CODE HERE
+                if event.key == pygame.K_DOWN and snake.ydir != -1:             # NEW CODE HERE
+                    snake.ydir = 1
+                    snake.xdir = 0
+                elif event.key == pygame.K_UP and snake.ydir != 1:              # NEW CODE HERE
+                    snake.ydir = -1
+                    snake.xdir = 0
+                elif event.key == pygame.K_RIGHT and snake.xdir != -1:          # NEW CODE HERE
+                    snake.ydir = 0
+                    snake.xdir = 1
+                elif event.key == pygame.K_LEFT and snake.xdir != 1:            # NEW CODE HERE
+                    snake.ydir = 0
+                    snake.xdir = -1
+                last_input_time = current_time                                  # NEW CODE HERE
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Apple" duration="10">
+        <h2 is-upgraded>Making a new Apple Class</h2>
+<pre><code>class Snake: ...
+
+class Apple:
+    def __init__(self):
+        self.x = random.randint(0, SW)
+        self.y = random.randint(0, SH)
+        self.rect = pygame.Rect(self.x, self.y, BLOCK_SIZE, BLOCK_SIZE)
+
+    def update(self):
+        pygame.draw.rect(screen, &#34;red&#34;, self.rect)
+</code></pre>
+<h2 is-upgraded>Initializing Apple and updating it</h2>
+<pre><code>drawGrid()
+snake = Snake()
+apple = Apple()     #NEW CODE HERE
+
+While True:
+    for event in pygame.event.get():
+</code></pre>
+<p>Scroll down to drawing section</p>
+<pre><code>    snake.update()
+    screen.fill(&#34;black&#34;)
+    drawGrid()
+    apple.update()  #NEW CODE HERE
+
+    pygame.draw.rect(screen, &#34;green&#34;, snake.head)
+
+    for square in snake.body:
+        pygame.draw.rect(screen, &#34;green&#34;, square)
+</code></pre>
+<h2 is-upgraded>Solving not on grid problem</h2>
+<pre><code>class Apple:
+    def __init__(self):
+        self.x = int(random.randint(0, SW)/BLOCK_SIZE) * BLOCK_SIZE          # CODE UPDATE
+        self.y = int(random.randint(0, SH)/BLOCK_SIZE) * BLOCK_SIZE          # CODE UPDATE
+        self.rect = pygame.Rect(self.x, self.y, BLOCK_SIZE, BLOCK_SIZE)
+
+    def update(self):
+        pygame.draw.rect(screen, &#34;red&#34;, self.rect)
+</code></pre>
+<h2 is-upgraded>Apple Collision</h2>
+<pre><code>pygame.draw.rect(screen, &#34;green&#34;, snake.head)
+
+for square in snake.body:
+    pygame.draw.rect(screen, &#34;green&#34;, square)
+
+screen.blit(score,score_rect)       # Display Score
+
+# NEW CODE HERE
+if snake.head.x == apple.x and snake.head.y == apple.y:
+    snake.body.append(pygame.Rect(square.x, square.y, BLOCK_SIZE, BLOCK_SIZE))      # square exists here because Python is built different (so square == the last piece of body from previous frame)
+    apple = Apple()
+# NEW CODE END
+
+pygame.display.update()
+clock.tick(10)      # delay in ms
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Death Collisions" duration="7">
+        <h2 is-upgraded>Add new checkDeath() function under Snake Class</h2>
+<pre><code>class Snake: ...
+    ...
+    def checkDeath(self):
+        for square in self.body:
+            if self.head.x == square.x and self.head.y == square.y:
+                self.dead = True
+            if self.head.x not in range(0, SW) or self.head.y not in range(0, SH):      # Demorgans law &gt;:)
+                self.dead = True
+</code></pre>
+<h2 is-upgraded>Call new checkDeath() function in update</h2>
+<pre><code>class Snake: ...
+    def update(self):
+        # NEW CODE HERE
+        global apple
+
+        self.checkDeath()
+
+        if self.dead:
+            self.x, self.y = int((SW/4)/BLOCK_SIZE) * BLOCK_SIZE, int((SH/2)/BLOCK_SIZE) * BLOCK_SIZE       
+            self.xdir = 1
+            self.ydir = 0
+            self.head = pg.Rect(self.x, self.y, BLOCK_SIZE, BLOCK_SIZE)
+            self.body = [pg.Rect(self.x - BLOCK_SIZE, self.y, BLOCK_SIZE, BLOCK_SIZE)]
+            self.dead = False
+            apple = Apple()
+        # NEW CODE END
+
+        self.body.append(self.head)
+        for i in range(len(self.body)-1):
+            self.body[i].x = self.body[i+1].x
+            self.body[i].y = self.body[i+1].y
+
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Score" duration="5">
+        <h2 is-upgraded>Creating a Score</h2>
+<p><code>FONT.render("text", anti aliasing, Color)</code></p>
+<pre><code>class Apple:...
+
+def drawGrid:...
+
+# NEW CODE HERE
+score = FONT.render(&#34;0&#34;, True, &#34;white&#34;)
+score_rect = score.get_rect(center=(SW/2, SH/16))
+# NEW CODE END
+
+drawGrid()
+snake = Snake()
+apple = Apple()
+</code></pre>
+<h2 is-upgraded>Rendering and updating Score on apple collision</h2>
+<pre><code>snake.update()
+    screen.fill(&#39;black&#39;)
+    drawGrid()
+
+    apple.update()
+
+    score = FONT.render(f&#34;{len(snake.body)-1}&#34;, True, &#34;white&#34;)      # NEW CODE HERE
+    screen.blit(score,score_rect)                                   # NEW CODE HERE
+
+    pygame.draw.rect(screen, &#34;green&#34;, snake.head)
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="CONGRATS SNAKE IS NOW A THING YOU DID" duration="1">
+        <p class="image-container"><img alt="Soly Image Caption" src="img\\44f356558033e250.gif"></p>
+<p>Thanks for participating please don&#39;t forget to check in, this is the only way we can argue for funding from the college next year</p>
+<p>FYI CoD club got like $10k 2 years ago and we have nothing ;~; <br>so please we need the money</p>
+
+
+      </google-codelab-step>
+    
+  </google-codelab>
+
+  <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+</html>
