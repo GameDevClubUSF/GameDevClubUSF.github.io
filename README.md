@@ -2,8 +2,10 @@
 ## For any code Lab with missing links access them with 
 GameDevClubUSF.github.io/`Insert Codelab Name`
 
-Otherwise 
-## Existing Codelabs:
-https://gamedevclubusf.github.io/SnakeCodeLab
-https://gamedevclubusf.github.io/PongCodeLab
-https://gamedevclubusf.github.io/WordleCodeLab
+ 
+## Check out our Existing Codelabs:
+* [Snake Codelab](https://gamedevclubusf.github.io/SnakeCodeLab)
+* [Wordle Codelab](https://gamedevclubusf.github.io/WordleCodeLab)
+* [Pong Codelab](https://gamedevclubusf.github.io/PongCodeLab)
+
+
