@@ -56,7 +56,7 @@
 <h2 is-upgraded>Check if they are installed correctly</h2>
 <p>Check Python <br> _ For Windows: <code>py --version</code><br> _ For Mac: <code>python3 --version</code></p>
 <p>Check Pygame: <code>pip show pygame</code></p>
-<h2 is-upgraded>Download Satoshi Font (Save in same folder as Snake.py)</h2>
+<h2 is-upgraded>Download Satoshi Font (Save in same folder as Pong.py)</h2>
 <p>If you use another font change Satoshi-Variable.ttf to file name in the code, <br> <a href="https://github.com/GameDevClubUSF/GameDevClubUSF.github.io/raw/main/Fonts/Satoshi-Variable.ttf" target="_blank">Download Font</a>.</p>
 
 
@@ -64,23 +64,23 @@
     
       <google-codelab-step label="Creating Screen and Grid" duration="7">
         <h2 is-upgraded>Pygame Boilerplate</h2>
-<pre><code>import pygame as pg
+<pre><code>import pygame
 import sys
 import random
 import time
 
-pg.init()
+pygame.init()
 
 SW, SH = 800, 800
 
 BLOCK_SIZE = 50;
-FONT = pg.font.Font(&#34;Satoshi-Variable.ttf&#34;, BLOCK_SIZE*2)
+FONT = pygame.font.Font(&#34;Satoshi-Variable.ttf&#34;, BLOCK_SIZE*2)
 
-screen = pg.display.set_mode((SW,SH))
-pg.display.set_caption(&#34;Snake&#34;)
-clock = pg.time.Clock()
+screen = pygame.display.set_mode((SW,SH))
+pygame.display.set_caption(&#34;Snake&#34;)
+clock = pygame.time.Clock()
 
-While True:
+while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -105,7 +105,7 @@ While True:
 
 drawGrid()
 
-While True:
+while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
 </code></pre>
@@ -130,7 +130,7 @@ While True:
 <pre><code>drawGrid()
 snake = Snake()
 
-While True:
+while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -160,7 +160,7 @@ While True:
 </code></pre>
 <p>This update method goes in the Snake class</p>
 <h2 is-upgraded>Calling the update</h2>
-<pre><code>While True:
+<pre><code>while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -235,16 +235,16 @@ while True:
         if event.type == pygame.KEYDOWN:
             current_time = time.time()                                          # NEW CODE HERE
             if current_time - last_input_time &gt; input_cooldown:                 # NEW CODE HERE
-                if event.key == pygame.K_DOWN and snake.ydir != -1:             # NEW CODE HERE
+                if event.key == pygame.K_DOWN and snake.ydir != -1:             # MODIFIED CODE HERE
                     snake.ydir = 1
                     snake.xdir = 0
-                elif event.key == pygame.K_UP and snake.ydir != 1:              # NEW CODE HERE
+                elif event.key == pygame.K_UP and snake.ydir != 1:              # MODIFIED CODE HERE
                     snake.ydir = -1
                     snake.xdir = 0
-                elif event.key == pygame.K_RIGHT and snake.xdir != -1:          # NEW CODE HERE
+                elif event.key == pygame.K_RIGHT and snake.xdir != -1:          # MODIFIED CODE HERE
                     snake.ydir = 0
                     snake.xdir = 1
-                elif event.key == pygame.K_LEFT and snake.xdir != 1:            # NEW CODE HERE
+                elif event.key == pygame.K_LEFT and snake.xdir != 1:            # MODIFIED CODE HERE
                     snake.ydir = 0
                     snake.xdir = -1
                 last_input_time = current_time                                  # NEW CODE HERE
@@ -271,7 +271,7 @@ class Apple:
 snake = Snake()
 apple = Apple()     #NEW CODE HERE
 
-While True:
+while True:
     for event in pygame.event.get():
 </code></pre>
 <p>Scroll down to drawing section</p>
@@ -339,8 +339,8 @@ clock.tick(10)      # delay in ms
             self.x, self.y = int((SW/4)/BLOCK_SIZE) * BLOCK_SIZE, int((SH/2)/BLOCK_SIZE) * BLOCK_SIZE       
             self.xdir = 1
             self.ydir = 0
-            self.head = pg.Rect(self.x, self.y, BLOCK_SIZE, BLOCK_SIZE)
-            self.body = [pg.Rect(self.x - BLOCK_SIZE, self.y, BLOCK_SIZE, BLOCK_SIZE)]
+            self.head = pygame.Rect(self.x, self.y, BLOCK_SIZE, BLOCK_SIZE)
+            self.body = [pygame.Rect(self.x - BLOCK_SIZE, self.y, BLOCK_SIZE, BLOCK_SIZE)]
             self.dead = False
             apple = Apple()
         # NEW CODE END
