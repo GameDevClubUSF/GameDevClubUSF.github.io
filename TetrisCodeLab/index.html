@@ -56,46 +56,17 @@
 
       </google-codelab-step>
     
-      <google-codelab-step label="Setting up Pygames and Play Area" duration="7">
-        <h2 is-upgraded>Step 1</h2>
-<pre><code>import pygame
-import sys
-from copy import deepcopy
-
-WIDTH, HEIGHT = 10, 20;
-TILE = 45;
-GAME_RES = (WIDTH * TILE, HEIGHT * TILE)
-CLOCK = pygame.time.Clock()
-
-pygame.init()
-screen = pygame.display.set_mode(GAME_RES)
-pygame.display.set_caption(&#34;Tetris&#34;)
-
-while True:
-    screen.fill(pygame.Color(&#34;black&#34;))
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-
-    pygame.display.update()
-    CLOCK.tick(60)
-</code></pre>
-<h2 is-upgraded>Step 2 making grid</h2>
-<pre><code>pygame.init()
-screen = pygame.display.set_mode(GAME_RES)
-pygame.display.set_caption(&#34;Tetris&#34;)
-
-# NEW CODE HERE
-GRID = [pygame.Rect(x * TILE, y * TILE, TILE, TILE) for x in range(WIDTH) for y in range(HEIGHT)] 
-</code></pre>
-<pre><code>for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-    # NEW CODE HERE
-    [pygame.draw.rect(screen, (40,40,40), i_rect, 1) for i_rect in GRID]
-</code></pre>
+      <google-codelab-step label="Setting up Pygames and Play Area" duration="5">
+        <h2 is-upgraded>Download stuff from our github</h2>
+<p><a href="https://github.com/GameDevClubUSF/GameDevClubUSF.github.io/raw/refs/heads/main/TetrisCodeLab/Tetris%20Imports.zip" target="_blank">Click here to download stuff</a><br>This includes:</p>
+<ul>
+<li>Pygame baseplate (work in this file)</li>
+<li>Background images</li>
+<li>HANGTHEDJ font</li>
+</ul>
+<h2 is-upgraded>Double check that python and pygames is installed on your machine</h2>
+<p>Check Python<br> For Windows: <code>py --version</code> <br> For Mac: <code>python3 --version</code></p>
+<p>Check for pygames Run in terminal: <code>pip show pygame</code></p>
 
 
       </google-codelab-step>
