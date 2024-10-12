@@ -493,14 +493,6 @@ title_SCORE = font.render(&#39;Score:&#39;, True, pygame.Color(&#39;purple&#39;)
     record = str(max(int(record) if record.isdigit() else 0, score))
     sc.blit(font.render(str(record), True, pygame.Color(&#39;gold&#39;)), (550, 710))
 </code></pre>
-<h2 is-upgraded>Getting and Storing Records</h2>
-<h3 is-upgraded>At top of game loop</h3>
-<pre><code># Game loop and initialization
-while True:
-    record = get_record()       # NEW CODE HERE
-    dir_x = 0
-    rotate = False
-</code></pre>
 
 
       </google-codelab-step>
