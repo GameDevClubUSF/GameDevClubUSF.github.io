@@ -358,6 +358,20 @@ tetrominos = [
         tetromino_rect.y = tetromino[i].y * TILE
         pygame.draw.rect(screen, tetromino[4], tetromino_rect)
 </code></pre>
+<h2 is-upgraded>Making it so Tetromino &#34;O&#34; no longer rotates</h2>
+<pre><code>    # Rotating
+    center = tetromino[0]
+    tetromino_old = deepcopy(tetromino)
+    if rotate and tetromino[4] != (255, 241, 0) :       # MODIFY CODE HERE
+        for i in range(4):
+            x = tetromino[i].y - center.y
+            y = tetromino[i].x - center.x
+            tetromino[i].x = center.x - x
+            tetromino[i].y = center.y + y
+            if not check_borders():
+                tetromino = deepcopy(tetromino_old)
+                break
+</code></pre>
 
 
       </google-codelab-step>
