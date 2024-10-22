@@ -8,5 +8,5 @@ GameDevClubUSF.github.io/`Insert Codelab Name`
 * [Wordle Codelab](https://gamedevclubusf.github.io/WordleCodeLab)
 * [Pong Codelab](https://gamedevclubusf.github.io/PongCodeLab)
 * [Tetris Codelab](https://gamedevclubusf.github.io/TetrisCodeLab/)
-
+* [FlappyBull](https://gamedevclubusf.github.io/FlappyBirdCodeLab/)
 
