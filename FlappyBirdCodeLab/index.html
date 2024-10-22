@@ -1,0 +1,611 @@
+
+<!doctype html>
+
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>Flappy Bird Codelab</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+  <google-codelab codelab-gaid=""
+                  codelab-ga4id=""
+                  id="FlappyBirdCodeLab"
+                  title="Flappy Bird Codelab"
+                  environment="web"
+                  feedback-link="https://github.com/SolaceDev/solace-dev-codelabs/blob/master/markdown/FlappyBirdCodeLab">
+    
+      <google-codelab-step label="Overview" duration="5">
+        <h2 is-upgraded>Table of Contents</h2>
+<ol type="1">
+<li>Overview</li>
+<li>Preqreusits, Downloading stuff</li>
+<li>Create new project</li>
+<li>Create new Scene</li>
+<li>Create Bird</li>
+<li>Create Ground</li>
+<li>Linking Bird and Ground to Scene</li>
+<li>Create Pipes</li>
+<li>Linking Pipes and Ground</li>
+<li>Changing Draw Order and Score</li>
+<li>Do top and ground checks</li>
+<li>Game Over</li>
+<li>Final Scripts (TO UNLEASH YOUR ULTIMATE TECHNIQUES)</li>
+<li>YIIPEEEE!!1!11!!!!</li>
+</ol>
+<h2 is-upgraded>Finished Project</h2>
+<p class="image-container"><img alt="Flappy Bull finished" src="img\\e879ed0940203f53.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Prerequisites: Download Gotdot and Assets" duration="15">
+        <h2 is-upgraded>Download Godot</h2>
+<p><a href="https://godotengine.org/download/" target="_blank">Click Here</a> to Dowload Godot</p>
+<h2 is-upgraded>Download our Assets</h2>
+<p><a target="_blank">Click here</a> to Download our Assets</p>
+<h2 is-upgraded>Run the correct Godot</h2>
+<p class="image-container"><img alt="Run the exe" src="img\\1b53f8f915b0aed9.jpeg"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Create New Project" duration="5">
+        <p class="image-container"><img alt="newproject" src="img\\89b263a78c8895b2.jpeg"></p>
+<p class="image-container"><img alt="newproject" src="img\\1dba73aa9abd26de.jpeg"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Create new Scene and Setup Project" duration="15">
+        <h2 is-upgraded>Resize Game Window (Width: 864, Height: 936)</h2>
+<p class="image-container"><img alt="Resize Game Window" src="img\\3cbeeae4add034b7.png"></p>
+<h2 is-upgraded>Create new Scene with Node (NOT Node2D) and a child with Sprite2D</h2>
+<p class="image-container"><img alt="Scene Setup 2" src="img\\352f83bbe4b54649.png"></p>
+<h2 is-upgraded>Drag background image to Sprite2D and add offset (X: 432, Y: 384)</h2>
+<p class="image-container"><img alt="Scene Setup 3" src="img\\4b178377428e20b.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Create Bird Scene" duration="5">
+        <h2 is-upgraded>Create new Scene (name it Bird)</h2>
+<h2 is-upgraded>Add Character Body2D</h2>
+<ul>
+<li>Animated Sprite 2D</li>
+<li>Collision Shape 2D</li>
+</ul>
+<h2 is-upgraded>Animate the Sprite, and Adjust the Collision shape</h2>
+<p class="image-container"><img alt="Bird Setup 1" src="img\\def949e4640b6b79.png"></p>
+<h2 is-upgraded>In AnimationSprite2D add new Animation and Drag bird to animator <br>(if using Rocky, adjust scale by 1.618)</h2>
+<p class="image-container"><img alt="Bird Setup 2" src="img\\4c6526d261820dfe.png"></p>
+<h2 is-upgraded>Add Capsule Colider to bird</h2>
+<p class="image-container"><img alt="Bird Setup 3" src="img\\166c4a1408891295.png"></p>
+<h2 is-upgraded>Create a new Script</h2>
+<pre><code>extends CharacterBody2D
+
+# Global Variables
+const GRAVITY: int = 1800
+const MAX_VEL: int = 600
+const START_POS = Vector2(100,400)
+const FLAP_SPEED: int = -500
+var flying: bool = false
+var falling: bool = false
+
+
+func _ready():
+	reset()
+	
+func reset():
+	falling = false
+	flying = false
+	position = START_POS
+	set_rotation(0)
+
+# Function that runs while game is running (Game loop)	
+func _physics_process(delta):
+	if flying or falling:
+		velocity.y += GRAVITY * delta
+		
+		if velocity.y &gt; MAX_VEL:
+			velocity.y = MAX_VEL
+		if flying: 
+			set_rotation (deg_to_rad(velocity.y * 0.05))
+			$AnimatedSprite2D.play()
+		elif falling:
+			set_rotation(PI/2)
+			$AnimatedSprite2D.stop()
+		move_and_collide(velocity * delta)
+	else:
+		$AnimatedSprite2D.stop()
+
+func flap():
+	velocity.y = FLAP_SPEED
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Create Ground Scene" duration="5">
+        <h2 is-upgraded>Adding Area2D node</h2>
+<ul>
+<li>Sprite 2D</li>
+<li>CollisionShape2D</li>
+</ul>
+<h2 is-upgraded>Add Sprite and collision shape</h2>
+<p class="image-container"><img alt="Ground setup 1" src="img\\7267251b46da7927.png"></p>
+<h2 is-upgraded>Offset X by 864, Position Transform Y by 852</h2>
+<p class="image-container"><img alt="Ground setup 2" src="img\\33ffe405a5d5c5ac.png"></p>
+<h2 is-upgraded>Add Rectangular Collision</h2>
+<p class="image-container"><img alt="Ground setup 3" src="img\\a4f88c2b425f8d71.png"></p>
+<h2 is-upgraded>Script for Ground (ground.gd)</h2>
+<pre><code>extends Area2D
+
+signal hit
+
+func _on_body_entered(body):
+	hit.emit()
+
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Incoperate Bird and Ground to Main" duration="8">
+        <h2 is-upgraded>Linking Bird to Main</h2>
+<p class="image-container"><img alt="Link Bird to Main" src="img\\51b03789a668660f.png"></p>
+<h2 is-upgraded>Linking Ground to Main</h2>
+<p class="image-container"><img alt="Link Bird to Main" src="img\\839668d1cd62b733.png"></p>
+<h2 is-upgraded>Coding main.gd</h2>
+<pre><code>extends Node
+
+var game_running: bool
+var game_over: bool
+var scroll
+var score
+const SCROLL_SPEED: int = 4
+var screen_size: Vector2i
+var ground_height: int
+var pipes: Array
+const PIPE_DELAY: int = 100
+const PIPE_RANGE: int = 200
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	screen_size = get_window().size
+	ground_height = $Ground.get_node(&#34;Sprite2D&#34;).texture.get_height()
+	new_game()
+
+func new_game():
+	game_running = false
+	game_over = false
+	score = 0
+	scroll = 0
+	$Bird.reset()
+	
+func _input(event):
+	if (game_over) == false:
+		if event is InputEventMouseButton:
+			if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+				if game_running == false:
+					start_game()
+				else:
+					if $Bird.flying:
+						$Bird.flap()
+					
+func start_game():
+	game_running = true
+	$Bird.flying = true
+	$Bird.flap()
+
+# Called every frame. &#39;delta&#39; is the elapsed time since the previous frame.
+func _process(delta):
+	if game_running:
+		scroll += SCROLL_SPEED
+		
+		if scroll &gt;= screen_size.x:
+			scroll = 0
+			
+		$Ground.position.x = -scroll
+		
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Create Pipe Scene" duration="5">
+        <h2 is-upgraded>Add two Sprite2D and four Collision2D</h2>
+<p class="image-container"><img alt="Pipe Setup 1" src="img\\41ddd0081d7fb99d.png"></p>
+<h2 is-upgraded>Add Image to upper Sprite2D, and offset by -380 and Flip Vertical</h2>
+<p class="image-container"><img alt="Pipe Setup 2" src="img\\efdac1bfe509388d.png"></p>
+<h2 is-upgraded>Add Image to lower Sprite2D, and offset by 380</h2>
+<p class="image-container"><img alt="Pipe Setup 3" src="img\\820eef3ed614c3aa.png"></p>
+<h2 is-upgraded>Set collisions to Rectangles and place them over pipes</h2>
+<p class="image-container"><img alt="Pipe Setup 4" src="img\\d20ddde67c0e77f.png"></p>
+<h2 is-upgraded>Add Score Area (HAS TO BE CALLED &#34;Score&#34; TO USE SCRIPT BELOW)</h2>
+<p class="image-container"><img alt="Pipe Setup 5" src="img\\89a5d9b2a2c4002f.png"></p>
+<h2 is-upgraded>Script for Pipes (MAKE SURE IT&#39;S CALLED &#34;Score&#34;) (pipe.gd)</h2>
+<pre><code>extends Area2D
+
+signal hit
+signal scored
+
+func _on_body_entered(body):
+	hit.emit()
+
+func _on_score_body_entered(body):
+	scored.emit()
+
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Incoperate Pipes to Main" duration="8">
+        <h2 is-upgraded>Add new Timer to main scene, rename it &#34;PipeTimer&#34; and change delay to 1.5 seconds</h2>
+<p class="image-container"><img alt="Pipe Timer 1" src="img\\e60b351ff4b7a899.png"></p>
+<h2 is-upgraded>Create a new variable and reference the Pipe scene</h2>
+<p class="image-container"><img alt="Pipe Timer 2" src="img\\bd895c9456704715.png"></p>
+<h2 is-upgraded>Modifying main.gd</h2>
+<p>Changes at:</p>
+<ul>
+<li>new_game()</li>
+<li>start_game()</li>
+<li>new Functions: _on_pipe_timer_timeout(), generate_pipes()</li>
+</ul>
+<pre><code>extends Node
+
+@export var pipe_scene:PackedScene
+
+var game_running: bool
+var game_over: bool
+var scroll
+var score
+const SCROLL_SPEED: int = 4
+var screen_size: Vector2i
+var ground_height: int
+var pipes: Array
+const PIPE_DELAY: int = 100
+const PIPE_RANGE: int = 200
+
+func scored():
+	pass
+	#score += 1
+	#$ScoreLabel.text = &#34;SCORE: &#34; + str(score)
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	screen_size = get_window().size
+	ground_height = $Ground.get_node(&#34;Sprite2D&#34;).texture.get_height()
+	new_game()
+
+func new_game():
+	game_running = false
+	game_over = false
+	score = 0
+	scroll = 0
+	$Bird.reset()
+	# NEW CODE HERE
+	generate_pipes()
+	
+func _input(event):
+	if (game_over) == false:
+		if event is InputEventMouseButton:
+			if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+				if game_running == false:
+					start_game()
+				else:
+					if $Bird.flying:
+						$Bird.flap()
+					
+func start_game():
+	game_running = true
+	$Bird.flying = true
+	$Bird.flap()
+	# NEW CODE HERE
+	$PipeTimer.start()
+
+# Called every frame. &#39;delta&#39; is the elapsed time since the previous frame.
+func _process(delta):
+	if game_running:
+		scroll += SCROLL_SPEED
+		
+		if scroll &gt;= screen_size.x:
+			scroll = 0
+			
+		$Ground.position.x = -scroll
+		
+		for pipe in pipes:
+			pipe.position.x -= SCROLL_SPEED
+			
+
+func stop_game():
+	$PipeTimer.stop()
+	$Bird.flying = false
+	$GameOver.show()
+	game_running = false
+	game_over = true
+
+func bird_hit():
+	$Bird.falling = true
+	stop_game()
+
+func _on_pipe_timer_timeout():
+	generate_pipes()
+
+func generate_pipes():
+	var pipe = pipe_scene.instantiate()
+	pipe.position.x = screen_size.x + PIPE_DELAY
+	pipe.position.y = (screen_size.y - ground_height) / 2 + randi_range(-PIPE_RANGE, PIPE_RANGE)
+	pipe.hit.connect(bird_hit)
+	pipe.scored.connect(scored)
+	add_child(pipe)		# Add new pipe object to scene main
+	pipes.append(pipe)	# Add new pipe object to pipes array, to keep track of them
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Changing draw order and Score" duration="8">
+        <h2 is-upgraded>Changing ground draw order (Do the same to Score Label)</h2>
+<p class="image-container"><img alt="Draw Order" src="img\\c91eafdabb745825.png"></p>
+<h2 is-upgraded>Back in main, add a Label Control Node, rename it ScoreLabel <br> (HAS TO BE ScoreLabel)</h2>
+<p class="image-container"><img alt="Score 1" src="img\\835899304db8f6e1.png"></p>
+<h2 is-upgraded>Inside Control -&gt; Theme Override -&gt; Font Size, set it to 40, and also change Font Color to #cbbd93</h2>
+<p class="image-container"><img alt="Score 2" src="img\\29d16b5c2cda8e6a.png"></p>
+<h2 is-upgraded>Coding (edit main.gd)</h2>
+<ul>
+<li>Uncomment code in scored()</li>
+<li>new_game() function</li>
+</ul>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Do top check and ground check" duration="5">
+        <h2 is-upgraded>Add new function to main.gd</h2>
+<pre><code>func check_top():
+	if $Bird.position.y &lt; 0:
+		$Bird.falling = true
+		stop_game()
+</code></pre>
+<h2 is-upgraded>Call the function in inputs when flapping</h2>
+<pre><code>func _input(event):
+	if (game_over) == false:
+		if event is InputEventMouseButton:
+			if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+				if game_running == false:
+					start_game()
+				else:
+					if $Bird.flying:
+						$Bird.flap()
+						check_top()
+</code></pre>
+<h2 is-upgraded>Adding Ground check</h2>
+<pre><code>func _on_ground_hit():
+	if $Bird.flying:
+		$Bird.flap()
+	$Bird.falling = true # Set to false if you dont want to let rocky drown
+	stop_game()
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Game Over Handling" duration="8">
+        <h2 is-upgraded>Create new Canvas Layer Scene, add Button Child node, and Override Themes with New StyleButtonTexture</h2>
+<p class="image-container"><img alt="Restart Btn 1" src="img\\e1467aec33acdeb7.png"></p>
+<h2 is-upgraded>Select the StyleButtonTexture (not the arrow) add the button Texture</h2>
+<p class="image-container"><img alt="Restart Btn 2" src="img\\ffdfce4a9df0f709.png"></p>
+<h2 is-upgraded>Repeat for Hover and Pressed</h2>
+<p class="image-container"><img alt="Restart Btn 3" src="img\\758fe3ac4d090dd8.png"></p>
+<h2 is-upgraded>Change the Transform, Control -&gt; Layout -&gt; Transform</h2>
+<p class="image-container"><img alt="Restart Btn 4" src="img\\70796b513450cb71.png"></p>
+<h2 is-upgraded>Restart Button Script</h2>
+<pre><code>extends CanvasLayer
+
+signal restart
+
+func _on_restart_button_pressed():
+	restart.emit()
+
+</code></pre>
+<h2 is-upgraded>Create new pipes group in Pipe scene</h2>
+<p class="image-container"><img alt="Pipes group" src="img\\f9769c370abde2e.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Final Scripts" duration="0">
+        <aside class="warning"><p> Note: Copying the code will not automatically link the nodes to the game. You will need to do that still.</p>
+</aside>
+<h2 is-upgraded>main.gd</h2>
+<pre><code>extends Node
+
+@export var pipe_scene:PackedScene
+
+var game_running: bool
+var game_over: bool
+var scroll
+var score
+const SCROLL_SPEED: int = 4
+var screen_size: Vector2i
+var ground_height: int
+var pipes: Array
+const PIPE_DELAY: int = 100
+const PIPE_RANGE: int = 200
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	screen_size = get_window().size
+	ground_height = $Ground.get_node(&#34;Sprite2D&#34;).texture.get_height()
+	new_game()
+
+func new_game():
+	game_running = false
+	game_over = false
+	score = 0
+	scroll = 0
+	$ScoreLabel.text = &#34;SCORE: &#34; + str(score)
+	$Bird.reset()
+	$GameOver.hide()
+	get_tree().call_group(&#34;pipes&#34;, &#34;queue_free&#34;)
+	pipes.clear()
+	generate_pipes()
+	
+func _input(event):
+	if (game_over) == false:
+		if event is InputEventMouseButton:
+			if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+				if game_running == false:
+					start_game()
+				else:
+					if $Bird.flying:
+						$Bird.flap()
+						check_top()
+					
+func start_game():
+	print(&#34;start game&#34;)
+	game_running = true
+	$Bird.flying = true
+	$Bird.flap()
+	$PipeTimer.start()
+
+# Called every frame. &#39;delta&#39; is the elapsed time since the previous frame.
+func _process(delta):
+	if game_running:
+		scroll += SCROLL_SPEED
+		
+		if scroll &gt;= screen_size.x:
+			scroll = 0
+			
+		$Ground.position.x = -scroll
+		
+		for pipe in pipes:
+			pipe.position.x -= SCROLL_SPEED
+			
+
+func _on_pipe_timer_timeout():
+	generate_pipes()
+
+func generate_pipes():
+	var pipe = pipe_scene.instantiate()
+	pipe.position.x = screen_size.x + PIPE_DELAY
+	pipe.position.y = (screen_size.y - ground_height) / 2 + randi_range(-PIPE_RANGE, PIPE_RANGE)
+	pipe.hit.connect(bird_hit)
+	pipe.scored.connect(scored)
+	add_child(pipe)		# Add new pipe object to scene main
+	pipes.append(pipe)	# Add new pipe object to pipes array, to keep track of them
+	
+func scored():
+	score += 1
+	$ScoreLabel.text = &#34;SCORE: &#34; + str(score)
+
+func stop_game():
+	$PipeTimer.stop()
+	$Bird.flying = false
+	$GameOver.show()
+	game_running = false
+	game_over = true
+
+func check_top():
+	if $Bird.position.y &lt; 0:
+		$Bird.falling = true
+		stop_game()
+
+func bird_hit():
+	$Bird.falling = true
+	stop_game()
+
+func _on_ground_hit():
+	if $Bird.flying:
+		$Bird.flap()
+	$Bird.falling = true # Set to false if you dont want to let rocky drown
+	stop_game()
+
+func _on_game_over_restart():
+	new_game()
+</code></pre>
+<h2 is-upgraded>bird.gd</h2>
+<pre><code>extends CharacterBody2D
+
+
+const GRAVITY: int = 1800
+const MAX_VEL: int = 600
+const START_POS = Vector2(100,400)
+const FLAP_SPEED: int = -500
+var flying: bool = false
+var falling: bool = false
+
+func _ready():
+	reset()
+	
+func reset():
+	falling = false
+	flying = false
+	position = START_POS
+	set_rotation(0)
+	
+func _physics_process(delta):
+	if flying or falling:
+		velocity.y += GRAVITY * delta
+		
+		if velocity.y &gt; MAX_VEL:
+			velocity.y = MAX_VEL
+		if flying: 
+			set_rotation (deg_to_rad(velocity.y * 0.05))
+			$AnimatedSprite2D.play()
+		elif falling:
+			set_rotation(PI/2)
+			$AnimatedSprite2D.stop()
+		move_and_collide(velocity * delta)
+	else:
+		$AnimatedSprite2D.stop()
+		
+func flap():
+	velocity.y = FLAP_SPEED
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="YAHOOO FLAPPY ROCKY FINISHED" duration="1">
+        <p>✅ Intro to Godot</p>
+<p>✅ Introduction to Game Engines</p>
+<p>❓ Checked in?!?</p>
+<p class="image-container"><img alt="Soly Image Caption" src="img\\44f356558033e250.gif"></p>
+<p>Solly thanks you for checking in and wanted to thank you guys personally. But Solly made a mistake and was forced to fight a galatic death god in a form of an alligator. But as one would expect from fighting a death god, he stood no chance. Fortunately it was an alligator and Solly grew up in Australia and came to Florida so he was able to escape with his life. But in return, he arrived on last Friday missing the workshop.</p>
+<p>After missing the workshop Solly went undercover and went to an esport event at USF and there he found something shocking. Other than how bad gamers smelled, there was food. The image below is the amount of food AFTER everyone ate, although they woould probably eat more after the event finished. But luckily there was a kind gamer girl who shared some food with Solly and he had his first meal in 3 days. So be remember to sign in so food can come to both Solly and us.</p>
+<p class="image-container"><img alt="Pizza 1" src="img\\e250f8219ab8fb00.jpeg"></p>
+<p class="image-container"><img alt="Pizza 2" src="img\\41e521ac67d1feb1.jpeg"></p>
+<p class="image-container"><img alt="Pizza 3" src="img\\cd56d60db997cee2.jpeg"></p>
+<p>Disapointly Solly did not make it today, for that he was only able to take 5 days off from a Triple A gaming studio per year. Thus he had left us with an gif of him waving at us.</p>
+
+
+      </google-codelab-step>
+    
+  </google-codelab>
+
+  <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+</html>

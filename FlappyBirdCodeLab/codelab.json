@@ -1,0 +1,27 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2024-10-21T22:37:10-04:00",
+  "id": "FlappyBirdCodeLab",
+  "duration": 93,
+  "title": "Flappy Bird Codelab",
+  "summary": "",
+  "source": "FlappyBirdCodeLab.md",
+  "theme": "",
+  "status": [
+    "published"
+  ],
+  "category": [
+    "flappybird"
+  ],
+  "tags": [
+    "flappybird",
+    "gotdot",
+    "web",
+    "workshop"
+  ],
+  "feedback": "https://github.com/SolaceDev/solace-dev-codelabs/blob/master/markdown/FlappyBirdCodeLab",
+  "url": "FlappyBirdCodeLab"
+}
