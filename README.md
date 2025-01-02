@@ -9,4 +9,4 @@ GameDevClubUSF.github.io/`Insert Codelab Name`
 * [Pong Codelab](https://gamedevclubusf.github.io/PongCodeLab)
 * [Tetris Codelab](https://gamedevclubusf.github.io/TetrisCodeLab/)
 * [FlappyBull Codelab](https://gamedevclubusf.github.io/FlappyBirdCodeLab/)
-
+* [2D Physics Codelab](https://gamedevclubusf.github.io/Physics2DCodeLab/)
