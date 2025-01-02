@@ -1,0 +1,870 @@
+
+<!doctype html>
+
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>2D Physics Simulation</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+  <google-codelab codelab-gaid=""
+                  codelab-ga4id=""
+                  id="Physics2dCodelab"
+                  title="2D Physics Simulation"
+                  environment="web"
+                  feedback-link="https://github.com/bustlingbungus/Codelabs-Baseplate/tree/Physics_2D">
+    
+      <google-codelab-step label="Overview" duration="0">
+        <h2 is-upgraded>Table of Contents</h2>
+<ol type="1">
+<li>This page</li>
+<li>Setup Python and pygame</li>
+<li>Adding one object to the game</li>
+<li>Creating the Vector2 class</li>
+<li>Adding basic physics</li>
+<li>Adding multiple objects into the game</li>
+<li>Collision Mechanics Part 1</li>
+<li>Collision Mechanics Part 2</li>
+<li>User Input Part 1 (extra)</li>
+<li>User Input Part 2 (extra)</li>
+<li>Optimisation Discussion (extra)</li>
+<li>Conclusion</li>
+</ol>
+<h2 is-upgraded>Final Simulation</h2>
+<p class="image-container"><img alt="Final Simulation" src="img\\bb9039530463819a.gif"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Setting Up Environment" duration="0">
+        <h2 is-upgraded>VSCode and Python</h2>
+<p>We will be using VSCode to create the Python code for this project. These can be downloaded here:</p>
+<ul>
+<li><a href="https://code.visualstudio.com/download" target="_blank">VSCode</a></li>
+<li><a href="https://www.python.org/downloads/" target="_blank">Python</a></li>
+</ul>
+<aside class="special"><p> If you use some IDE other than VSCode, that should be fine!</p>
+</aside>
+<h2 is-upgraded>Make sure to check this box here:</h2>
+<p class="image-container"><img alt="Python Instruction" src="img\\fec1919449fdd977.png"></p>
+<h2 is-upgraded>Pygame</h2>
+<p>This project will use an API called <code>pygame</code> to create a window and render things onto it. To get pygame, just type the following command in a VSCode terminal:</p>
+<p>For Windows:</p>
+<pre><code language="language-bash" class="language-bash">py -m pip install -U pygame --user
+</code></pre>
+<p>For Mac:</p>
+<pre><code language="language-bash" class="language-bash">python3 -m pip install -U pygame --user
+</code></pre>
+<p>Create a new folder on your computer for this project, and open it in VSCode.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Creating an Individual Game Object" duration="0">
+        <h2 is-upgraded>Create two files</h2>
+<p>This project will be split between two files. One for the management code, and one for class definitions. In your folder, create</p>
+<ul>
+<li>main.py</li>
+<li>Classes.py</li>
+</ul>
+<h2 is-upgraded>main.py (pygame boilerplate)</h2>
+<p>This is just a baseplate for opening a window in pygame. We&#39;ll be modifying this as we develop the project</p>
+<pre><code language="language-Python" class="language-Python">import pygame, sys
+
+# Colour variables 
+BACKGROUND_COLOR = &#34;white&#34;
+
+# Window dimensions. Set up the window, and a clock
+WIDTH, HEIGHT = 720, 720
+WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
+CLOCK = pygame.time.Clock()
+
+quit_app = False
+
+# Main simulation loop
+while (not quit_app):
+    
+    # Handle input
+    for event in pygame.event.get():
+        # Exit when you press the X
+        if event.type == pygame.QUIT:
+            quit_app = True
+
+    # Fill the window with a solid colour
+    WINDOW.fill(BACKGROUND_COLOR)
+
+    # Update the window
+    pygame.display.update()
+    CLOCK.tick(300)
+
+# Close the application when the main loop exits
+pygame.quit()
+sys.exit()
+</code></pre>
+<h2 is-upgraded>Classes.py (entity definition)</h2>
+<p>In this simulation, we&#39;re going to make circles that bounce around the window. Each of these balls will have a position, and a radius, so in <code>Classes.py</code>, let&#39;s define a class for them like this:</p>
+<pre><code language="language-Python" class="language-Python"># A class for a collision object
+class Ball:
+    # Initialise position and radius
+    def __init__(self, x, y, radius):
+        self.x, self.y = x, y
+        self.radius = radius
+</code></pre>
+<h2 is-upgraded>Adding a ball in main.py</h2>
+<p>To add an individual ball onto the window, go back to <code>main.py</code>, and include this class definition. Then create a ball object and render it every frame.</p>
+<pre><code language="language-Python" class="language-Python"># Create a ball object
+object = Ball(360, 360, 20)         # &lt;------------- ADD THIS LINE HERE
+
+quit_app = False
+
+# Main simulation loop
+while (not quit_app):
+    
+    # Handle input
+    for event in pygame.event.get():
+        # Exit when you press the X
+        if event.type == pygame.QUIT:
+            quit_app = True
+
+    # Fill the window with a solid colour
+    WINDOW.fill(BACKGROUND_COLOR)
+    
+    # Render the ball at its position
+    pygame.draw.circle(WINDOW, &#34;blue&#34;, (object.x, object.y), object.radius, 1) # &lt;----- ADD THIS LINE HERE
+
+    # Update the window
+    pygame.display.update()
+    CLOCK.tick(300)
+</code></pre>
+<h2 is-upgraded>When you run <code>main.py</code>, there should now be a circle in the middle of the window.</h2>
+<p class="image-container"><img alt="Single Circle on the Window" src="img\\8f2bd6393e19e397.PNG"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Creating the Vector2 class" duration="0">
+        <p>To represent position in 2D space, the x and y coordinates can be made into a 2D vector. Creating a class for a 2D vector will be useful because we can organise an x,y pair into one object, and we can add class functions like <code>length</code> to find vector magnitude, and overload operators to make vector arithmetic easier.</p>
+<p>Go to <code>Classes.py</code>, and before the <code>Ball</code> class definition, create a <code>Vector2</code> class:</p>
+<pre><code language="language-Python" class="language-Python"># Define a structure to represent 2D position, velocity, and acceleration
+class Vector2:
+    
+    # Initialise x and y variables 
+    def __init__(self, x = 0, y = 0):
+        self.x, self.y = x, y
+</code></pre>
+<p>For later use in this project, we&#39;re going to need to find the magnitude of a vector, as well as create unit vectors (which is a vector whose magnitude is 1).</p>
+<p>We&#39;re also going to overload operators to allow for arithmetic between two vector objects, using traditional operators, like <code>+</code> and <code>*</code>.</p>
+<p>Add these functions to the <code>Vector2</code>:</p>
+<pre><code language="language-Python" class="language-Python">from math import sqrt       # &lt;-------- ADD THIS LINE HERE
+
+# Define a structure to represent 2D position, velocity, and acceleration
+class Vector2:
+    
+    # Initialise x and y variables 
+    def __init__(self, x = 0, y = 0):
+        self.x, self.y = x, y
+
+    # |                        |
+    # |   ADD THESE FUNCTIONS  |
+    # V                        V
+
+    # The magnitude of the vector is sqrt(x^2 + y^2)
+    def length(self):
+        return sqrt((self.x**2) + (self.y**2))
+    
+    # Make the vector&#39;s length 1 by dividing x and y by the length
+    def normalize(self):
+        leng = self.length()
+        self.x /= leng
+        self.y /= leng
+
+    # Redefine basic operators to make vector arithmetic easier
+    
+    # Redefine - to return this vector minus the other vector
+    def __sub__(self, other):
+        return Vector2(self.x - other.x, self.y - other.y)
+    
+    # Redefine -= to subtract the other vector&#39;s x and y components from this one
+    def __isub__(self, other):
+        return Vector2(self.x - other.x, self.y - other.y)
+    
+    # Redefine += to add the other vector&#39;s x and y components to this one
+    def __iadd__(self, other):
+        return Vector2(self.x + other.x, self.y + other.y)
+        
+    # Redefine * to return x and y multiplied by k
+    def __mul__(self, k):
+        return Vector2(self.x * k, self.y * k)
+</code></pre>
+<aside class="warning"><p> We could add other operator overloads for things like scalar division, the dot product, etc. I wanted to reduce clutter though, since those operations aren&#39;t used in this project. See if you can implement them! :)</p>
+</aside>
+<h2 is-upgraded>Give the Ball class Vector2 members</h2>
+<p>Let&#39;s replace the <code>Ball</code> class&#39; position with one Vector2, and add a velocity and acceleration vector to the class as well.</p>
+<ul>
+<li>In <code>Classes.py</code>:</li>
+</ul>
+<pre><code language="language-Python" class="language-Python"># A class for a collision object
+class Ball:
+    # Initialise position, velocity, acceleration, and radius
+    def __init__(self, x, y, radius):
+        self.pos = Vector2(x, y)            # &lt;------ ADD THIS LINE HERE
+        self.velocity = Vector2(0, 0)       # &lt;------ ADD THIS LINE HERE
+        self.acceleration = Vector2(0, 0)   # &lt;------ ADD THIS LINE HERE
+        
+        self.radius = radius
+</code></pre>
+<ul>
+<li>In <code>main.py</code>:</li>
+</ul>
+<pre><code language="language-Python" class="language-Python"># Create a ball object
+object = Ball(360, 360, 20)
+
+quit_app = False
+
+# Main simulation loop
+while (not quit_app):
+    
+    # Handle input
+    for event in pygame.event.get():
+        # Exit when you press the X
+        if event.type == pygame.QUIT:
+            quit_app = True
+
+    # Fill the window with a solid colour
+    WINDOW.fill(BACKGROUND_COLOR)
+    
+    # Render the ball at its position
+    # |                  |
+    # | MODIFY THIS LINE |
+    # V                  V
+    pygame.draw.circle(WINDOW, &#34;blue&#34;, (object.pos.x, object.pos.y), object.radius, 1)
+
+    # Update the window
+    pygame.display.update()
+    CLOCK.tick(300)
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Add basic physics" duration="0">
+        <h2 is-upgraded>Add Gravity</h2>
+<p>Let&#39;s start by applying gravity to the ball every frame. To do this, we&#39;re just going to set the ball&#39;s velocity to a constant gravity vector, then add acceleration to velocity, and velocity to position every frame. We&#39;ll package all this into one <code>update</code> function, which will be called every frame.</p>
+<p>In <code>Classes.py</code>, update the <code>Ball</code> class:</p>
+<pre><code language="language-Python" class="language-Python"># A class for a collision object
+class Ball:
+    # Initialise position, velocity, acceleration, and radius
+    def __init__(self, x, y, radius):
+        self.pos = Vector2(x, y)            # &lt;------ ADD THIS LINE HERE
+        self.velocity = Vector2(0, 0)       # &lt;------ ADD THIS LINE HERE
+        self.acceleration = Vector2(0, 0)   # &lt;------ ADD THIS LINE HERE
+        
+        self.radius = radius
+        
+    # |                     |
+    # |  ADD THIS FUNCTION  |
+    # V                     V
+    # update position and velocity
+    def update(self, gravity):
+        # For this example, acceleration will always just be gravity
+        self.acceleration = gravity
+        # Add accerleration to velocity, and add velocity to acceleration
+        self.velocity += self.acceleration
+        self.pos += self.velocity
+</code></pre>
+<h2 is-upgraded>Window Border Collisions</h2>
+<p>We&#39;ll also make the ball bounce off the edges of the window. To do this, we&#39;ll detect any window edge the ball collides with. On collision, we&#39;ll set the ball&#39;s position back in bounds, and multiply it&#39;s corresponding velocity component by a negative number, so that it starts moving in the opposite direction along the appropriate axis.</p>
+<p>For instance, if the ball hits the bottom of the window, <code>velocity.y</code> will be multiplied by -1, so that it will start moving upwards instead of downwards.</p>
+<p>Instead of multiplying by -1, though, let&#39;s multiply by -0.9, so that the magnitude gets graduall smaller, and the ball will eventually stop bouncing.</p>
+<p>To detect this, we&#39;ll also need to give the ball the dimensions of the window, so it knows when it&#39;s out of bounds.</p>
+<p>Make changes to <code>__init__</code>, then add this function to the <code>Ball</code> class, and call it in <code>update</code>:</p>
+<pre><code language="language-Python" class="language-Python"># A class for a collision object
+class Ball:
+    # Initialise position, velocity, acceleration, and radius
+    # Initialise window dimensions 
+    def __init__(self, x, y, radius, wndWidth, wndHeight):      # &lt;------ ADD NEW ARGUMENTS HERE
+        self.pos = Vector2(x, y)
+        self.velocity = Vector2(0, 0)
+        self.acceleration = Vector2(0, 0)
+        
+        self.radius = radius
+
+        self.wndWidth, self.wndHeight = wndWidth, wndHeight     # &lt;------ ADD THIS LINE HERE
+        
+    # Update position and velocity. Bounce off window borders
+    def update(self, gravity):
+        # Collide with the window borders
+        self.collide_with_borders()             # &lt;------ CALL THE NEW FUNCTION HERE
+
+        # For this example, acceleration will always just be gravity
+        self.acceleration = gravity
+        # Add accerleration to velocity, and add velocity to acceleration
+        self.velocity += self.acceleration
+        self.pos += self.velocity
+
+    # |                     |
+    # |  ADD THIS FUNCTION  |
+    # V                     V
+    # Bounces the ball off the side of the window by setting its position back inside the window,
+    # Then multiplying it&#39;s velocity by a negative number to travel in the opposite direction
+    def collide_with_borders(self):
+        # Out of bounds on the left side
+        if (self.pos.x &lt; self.radius):
+            self.pos.x = self.radius
+            self.velocity.x *= -0.9
+        # Out of bound on the right side
+        elif (self.pos.x &gt; self.wndWidth-self.radius):
+            self.pos.x = self.wndWidth-self.radius
+            self.velocity.x *= -0.9
+        # Out of bounds on the top
+        if (self.pos.y &lt; self.radius):
+            self.pos.y = self.radius
+            self.velocity.y *= -0.9
+        # Out of bounds on the bottom
+        elif (self.pos.y &gt; self.wndHeight-self.radius):
+            self.pos.y = self.wndHeight-self.radius
+            self.velocity.y *= -0.9
+</code></pre>
+<h2 is-upgraded>Implement in main.py</h2>
+<p>Because we made changes to <code>Ball</code>&#39;s initialiser, and need to have gravity, make these changes in <code>main.py</code>:</p>
+<pre><code language="language-Python" class="language-Python">import pygame, sys
+# Import the classes we&#39;ve made 
+from Classes import Ball, Vector2       # &lt;------ MODIFY THIS LINE HERE
+
+# Colour variables 
+BACKGROUND_COLOR = &#34;white&#34;
+
+# Gravity direction and magnitude
+GRAVITY_STRENGTH = 0.1                      # &lt;------ ADD THIS LINE HERE
+gravity = Vector2(0, GRAVITY_STRENGTH)      # &lt;------ ADD THIS LINE HERE
+
+# Window dimensions. Set up the window, and a clock
+WIDTH, HEIGHT = 720, 720
+WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
+CLOCK = pygame.time.Clock()
+
+
+# Create a ball object
+object = Ball(360, 360, 20, WIDTH, HEIGHT)      # &lt;------ MODIFY THIS LINE HERE
+</code></pre>
+<p>Also in <code>main.py</code>, call the object&#39;s update function:</p>
+<pre><code language="language-Python" class="language-Python"># Main simulation loop
+while (not quit_app):
+    
+    # Handle input
+    for event in pygame.event.get():
+        # Exit when you press the X
+        if event.type == pygame.QUIT:
+            quit_app = True
+
+    # Fill the window with a solid colour
+    WINDOW.fill(BACKGROUND_COLOR)
+    
+    # Update the ball
+    object.update(gravity)          # &lt;------ ADD THIS LINE HERE
+    # Render the ball at its position
+    pygame.draw.circle(WINDOW, &#34;blue&#34;, (object.pos.x, object.pos.y), object.radius, 1)
+
+    # Update the window
+    pygame.display.update()
+    CLOCK.tick(300)
+</code></pre>
+<p>Now, the ball should bounce on the window&#39;s floor!</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Add more objects!" duration="0">
+        <p>Before we start making entities collide with each other, we&#39;re going to make it possible to add multiple objects in the first place. We&#39;ll store all the physics objects in an array called <code>objects</code>, then for each ball in object, we&#39;ll call <code>update</code> and render it each frame.</p>
+<p>Make these changes in <code>main.py</code>:</p>
+<pre><code language="language-Python" class="language-Python"># This array will contain all balls in the simulation
+objects = []                                            # &lt;----- ADD THIS LINE HERE
+
+############################################################
+# remove the declaration for &#34;object&#34; that used to be here #
+############################################################
+
+quit_app = False
+
+# Main simulation loop
+while (not quit_app):
+    
+    # Handle input
+    for event in pygame.event.get():
+        # Exit when you press the X
+        if event.type == pygame.QUIT:
+            quit_app = True
+
+    # Fill the window with a solid colour
+    WINDOW.fill(BACKGROUND_COLOR)
+    
+    # Iterate through each ball                                                     
+    for ball in objects:                                                                # &lt;----- ADD THIS LINE HERE
+        # Each frame, update each ball and render it
+        ball.update(gravity)                                                            # &lt;----- ADD THIS LINE HERE
+        pygame.draw.circle(WINDOW, &#34;blue&#34;, (ball.pos.x, ball.pos.y), ball.radius, 1)    # &lt;----- ADD THIS LINE HERE
+
+    ###########################################################
+    # remove the two lines with &#34;object&#34; that used to be here #
+    ###########################################################
+
+    # Update the window
+    pygame.display.update()
+    CLOCK.tick(300)
+</code></pre>
+<h2 is-upgraded>Create ball when left clicking</h2>
+<p>To spawn more balls into the simulation, let&#39;s spawn a ball on the mouse&#39;s cursor whenever you left click. To do this (and to do more stuff later), let&#39;s add a <code>get_input</code> function to <code>main.py</code>:</p>
+<pre><code language="language-Python" class="language-Python"># Window dimensions. Set up the window, and a clock
+WIDTH, HEIGHT = 720, 720
+WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
+CLOCK = pygame.time.Clock()
+
+
+# |                     |
+# |  ADD THIS FUNCTION  |
+# V                     V
+left_mouseDown = False
+
+# change global variables according to user input
+def get_input(event):
+    # declare external variables
+    global left_mouseDown, right_mouseDown, gravity
+    
+    # update mouse variables when the mouse is pressed or released
+    if event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.MOUSEBUTTONUP:
+        # get an array of all the mouse buttons
+        mouse_buttons = pygame.mouse.get_pressed()
+        # update variables 
+        left_mouseDown = mouse_buttons[0]
+
+# This array will contain all balls in the simulation
+objects = []
+</code></pre>
+<p>Then, be sure to call the new function in the main window loop:</p>
+<pre><code language="language-Python" class="language-Python"># This array will contain all balls in the simulation
+objects = []
+
+quit_app = False
+
+# Main simulation loop
+while (not quit_app):
+    
+    # Handle input
+    for event in pygame.event.get():
+        # Exit when you press the X
+        if event.type == pygame.QUIT:
+            quit_app = True
+        else:                       # &lt;------ ADD THIS LINE HERE
+            get_input(event)        # &lt;------ ADD THIS LINE HERE
+
+    # Fill the window with a solid colour
+    WINDOW.fill(BACKGROUND_COLOR)
+</code></pre>
+<p>Finally, now that we have a way to detect left clicks, let&#39;s spawn a ball on the moiuse when you left click!</p>
+<p>Add this code into the main window loop:</p>
+<pre><code language="language-Python" class="language-Python"># Main simulation loop
+while (not quit_app):
+    
+    # Handle input
+    for event in pygame.event.get():
+        # Exit when you press the X
+        if event.type == pygame.QUIT:
+            quit_app = True
+        else:
+            get_input(event)
+
+    # Fill the window with a solid colour
+    WINDOW.fill(BACKGROUND_COLOR)
+    
+    # When pressing left mouse, spawn a ball on the mouse
+    if left_mouseDown:                                      # &lt;----- ADD THIS LINE HERE
+        # Find the mouse&#39;s position
+        mousex, mousey = pygame.mouse.get_pos()             # &lt;----- ADD THIS LINE HERE
+        # Spawn in a new ball at (mousex, mousey)
+        ball = Ball(mousex, mousey, 20, WIDTH, HEIGHT)      # &lt;----- ADD THIS LINE HERE
+        # Add the ball to the array
+        objects.append(ball)                                # &lt;----- ADD THIS LINE HERE
+    
+    # Iterate through each ball
+    for ball in objects:
+        # Each frame, update each ball and render it
+        ball.update(gravity)
+        pygame.draw.circle(WINDOW, &#34;blue&#34;, (ball.pos.x, ball.pos.y), ball.radius, 1)
+</code></pre>
+<p>Now, when you left click on the window, a ball will be spawned on the cursor!</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Ball collisions" duration="0">
+        <h2 is-upgraded>Elastic Collisions</h2>
+<p>For simplicity, this simulation will assume perfect elastic collision, and will assume that all objects have a mass of 1.</p>
+<p>What this means is that when two objects collide, we&#39;ll implement the elastic collision formula:</p>
+<p class="image-container"><img alt="Elastic Collision Formula" src="img\\aed99fdb90bab175.PNG"></p>
+<aside class="warning"><p> Since we&#39;re assuming all objects have a mass of 1, though, all instances of <code>m</code> above can be ignored, giving:</p>
+<p class="image-container"><img alt="Elastic Collision Simplified" src="img\\9692c56420b66574.PNG"></p>
+</aside>
+<aside class="warning"><p> Another way to look at this formula is that, after a collision:</p>
+<p class="image-container"><img alt="Elastic Formula Final" src="img\\f8f177f7c737b822.PNG"></p>
+</aside>
+<aside class="special"><p> Or in other words, the two objects swap velocities after a collision.</p>
+</aside>
+<h2 is-upgraded>Implementation in code</h2>
+<p>Let&#39;s start implementing a function in the <code>Ball</code> class that will handle collision with one other ball. It&#39;ll be empty for now, and we&#39;ll add to it in this slide:</p>
+<p>Add this function to the <code>Ball</code> class in <code>Classes.py</code>:</p>
+<pre><code language="language-Python" class="language-Python"># A class for a collision object
+class Ball:
+
+    # Handles collision with another ball by pushing them apart and swapping their velocities
+
+    def collide_with_ball(self, other):         # &lt;-----ADD THIS LINE HERE
+
+</code></pre>
+<p>We need to be able to detect if the two circles in the function are collding. One way to do this is to measure how far apart they are. If the distance between two circle&#39;s centres is less than the sum of their radii, then the two circles are intersecting.</p>
+<p>Note that if the distance between circle centres is 0, the ball is probably checking itself, so we won&#39;t consider the collision.</p>
+<p>Begin adding code for this in the <code>collide_with_ball</code> function:</p>
+<pre><code language="language-Python" class="language-Python">def collide_with_ball(self, other):
+        # Find the displacement between the two balls
+        disp = other.pos - self.pos
+        
+        # r (sum of the radii) is the smallest distance to not be a collision
+        r = self.radius + other.radius
+        # find the length of the displacement
+        # If the length is zero, then &#34;other&#34; is the same ball as &#34;self&#34;, so no collision should happen
+        leng = disp.length()
+        
+        # If the displacement is less than the sum of radii, there is a collision
+        if (leng &lt; r and leng != 0):
+            
+</code></pre>
+<p>So now let&#39;s handle what happens when the two balls ARE colliding.</p>
+<p>Before we swap their velocities, we should push their positions apart, so that they aren&#39;t physically touching anymore.</p>
+<p>The distance the balls move will be half the distance they are intersecting by. The distance the balls are intersecting is the sum of their radii (r), minus the magnitude of the displacement vector (disp.length()).</p>
+<p>In order to push the objects in the right direction, get the displacement as a unit vector to represent the direction of the displacement. Then, once you calculate the movement distance, multiply it by the unit vector, and add the resulting vector to the other object&#39;s position, and subtract it from self&#39;s position. (this is why we created the member functions for the vectors :-))</p>
+<p>Add this code to the <code>collide_with_ball</code> function:</p>
+<pre><code language="language-Python" class="language-Python">def collide_with_ball(self, other):
+        # Find the displacement between the two balls
+        disp = other.pos - self.pos
+        
+        # r (sum of the radii) is the smallest distance to not be a collision
+        r = self.radius + other.radius
+        # find the length of the displacement
+        # If the length is zero, then &#34;other&#34; is the same ball as &#34;self&#34;, so no collision should happen
+        leng = disp.length()
+        
+        # If the displacement is less than the sum of radii, there is a collision
+        if (leng &lt; r and leng != 0):
+
+            # |                 |
+            # |  ADD THIS CODE  |
+            # V                 V
+
+            # Normalise the displacement to get a unit vector (the direction of the displacemnet)
+            disp.normalize()
+            # Each ball will move half the distance that they&#39;re overlapping by
+            # Find this distance by subtracting leng from r, then dividing by 2
+            # Add 1 to avoid repeat collisions on subsequent checks
+            move = (r - leng)/2 + 1
+            
+            # Alter each ball&#39;s position by &#34;move&#34; units, along the direction of displacement by multiplying the 
+            # unit vector by &#34;move&#34;, then adding/subtracting it from position
+            self.pos -= disp * move
+            other.pos += disp * move
+</code></pre>
+<p>Now that the two balls get pushed apart upon collision, we can add code to swap their velocities. Don&#39;t worry, this is literally just three lines.</p>
+<p>Add these three lines after the code we just made:</p>
+<pre><code language="language-Python" class="language-Python">def collide_with_ball(self, other):
+        # Find the displacement between the two balls
+        disp = other.pos - self.pos
+        
+        # r (sum of the radii) is the smallest distance to not be a collision
+        r = self.radius + other.radius
+        # find the length of the displacement
+        # If the length is zero, then &#34;other&#34; is the same ball as &#34;self&#34;, so no collision should happen
+        leng = disp.length()
+        
+        # If the displacement is less than the sum of radii, there is a collision
+        if (leng &lt; r and leng != 0):
+            # Normalise the displacement to get a unit vector (the direction of the displacemnet)
+            disp.normalize()
+            # Each ball will move half the distance that they&#39;re overlapping by
+            # Find this distance by subtracting leng from r, then dividing by 2
+            # Add 1 to avoid repeat collisions on subsequent checks
+            move = (r - leng)/2 + 1
+            
+            # Alter each ball&#39;s position by &#34;move&#34; units, along the direction of displacement by multiplying the 
+            # unit vector by &#34;move&#34;, then adding/subtracting it from position
+            self.pos -= disp * move
+            other.pos += disp * move
+            
+            # |                 |
+            # |  ADD THIS CODE  |
+            # V                 V
+
+            # On collisions, swap the ball&#39;s velocities (since in this example they all have mass 1)
+            temp = self.velocity
+            self.velocity = other.velocity
+            other.velocity = temp
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Implementing collision function" duration="0">
+        <p>Now that we have a working collision function, there needs to be a way for each ball to check for collision with every other ball each frame.</p>
+<p>The first thing we&#39;ll do is modify the <code>update</code> function to take in an array of physics objects, and iterate through that.</p>
+<p>Make this change to the <code>Ball</code> class&#39; <code>update</code> function in <code>Classes.py</code>:</p>
+<pre><code language="language-Python" class="language-Python"># A class for a collision object
+class Ball:
+    # Initialise position, velocity, acceleration, and radius
+    # Initialise window dimensions 
+    def __init__(self, x, y, radius, wndWidth, wndHeight):
+        self.pos = Vector2(x, y)          
+        self.velocity = Vector2(0, 0)     
+        self.acceleration = Vector2(0, 0) 
+        
+        self.radius = radius
+        
+        self.wndWidth, self.wndHeight = wndWidth, wndHeight
+        
+    # Update position and velocity. Bounce off window borders
+
+    def update(self, objects, gravity):         # &lt;----- MODIFY THIS LINE HERE
+
+        # Iterate through all other balls, and handle collisions
+
+        for ball in objects:                    # &lt;----- ADD THIS LINE HERE
+            self.collide_with_ball(ball)        # &lt;----- ADD THIS LINE HERE
+
+        # Collide with the window borders
+        self.collide_with_borders()
+
+        # For this example, acceleration will always just be gravity
+        self.acceleration = gravity
+        # Add accerleration to velocity, and add velocity to acceleration
+        self.velocity += self.acceleration
+        self.pos += self.velocity
+</code></pre>
+<h2 is-upgraded>Implement in main</h2>
+<p>Now that the <code>Ball</code> class is adapted to handle collisions, we can modify the code in <code>main.py</code> accordingly.</p>
+<p>Edit this line in <code>main.py</code>:</p>
+<pre><code language="language-Python" class="language-Python"># Main simulation loop
+while (not quit_app):
+    
+    # Handle input
+    for event in pygame.event.get():
+        # Exit when you press the X
+        if event.type == pygame.QUIT:
+            quit_app = True
+        else:
+            get_input(event)
+
+    # Fill the window with a solid colour
+    WINDOW.fill(BACKGROUND_COLOR)
+    
+    # When pressing left mouse, spawn a ball on the mouse
+    if left_mouseDown:
+        # Find the mouse&#39;s position
+        mousex, mousey = pygame.mouse.get_pos()
+        # Spawn in a new ball at (mousex, mousey)
+        ball = Ball(mousex, mousey, 20, WIDTH, HEIGHT)
+        # Add the ball to the array
+        objects.append(ball)
+    
+    # Iterate through each ball
+    for ball in objects:
+        # Each frame, update each ball and render it
+
+        ball.update(objects, gravity)       # &lt;------ UPDATE THIS LINE HERE
+
+        pygame.draw.circle(WINDOW, &#34;blue&#34;, (ball.pos.x, ball.pos.y), ball.radius, 1)
+
+    # Update the window
+    pygame.display.update()
+    CLOCK.tick(300)
+</code></pre>
+<p>Now the simulation is technically fully working!!!!</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Extra fun stuff pt 1 :)" duration="0">
+        <h2 is-upgraded>Remove objects with right click</h2>
+<p>We have a way to add a LOT of objects to the simulation, but no way to remove them. Let&#39;s remove balls near the mouse with right click. We&#39;ll also have a brush size, to determine how close a ball needs to be to the mouse to be removed.</p>
+<p>Make this change to the <code>get_input</code> function to detect right clicks:</p>
+<pre><code language="language-Python" class="language-Python"># The radius of the brush to remove balls
+
+BRUSH_SIZE = 20             # &lt;----- ADD THIS LINE HERE
+
+left_mouseDown = False
+right_mouseDown = False     # &lt;----- ADD THIS LINE HERE
+
+# change global variables according to user input
+def get_input(event):
+    # declare external variables
+    global left_mouseDown, right_mouseDown, gravity
+    
+    # update mouse variables when the mouse is pressed or released
+    if event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.MOUSEBUTTONUP:
+        # get an array of all the mouse buttons
+        mouse_buttons = pygame.mouse.get_pressed()
+        # update variables 
+        left_mouseDown = mouse_buttons[0]
+        right_mouseDown = mouse_buttons[2]      # &lt;----- ADD THIS LINE HERE
+</code></pre>
+<p>Now that we can track right mouse, add this code to the main window loop:</p>
+<pre><code language="language-Python" class="language-Python"># When pressing left mouse, spawn a ball on the mouse
+    if left_mouseDown:
+        # Find the mouse&#39;s position
+        mousex, mousey = pygame.mouse.get_pos()
+        # Spawn in a new ball at (mousex, mousey)
+        ball = Ball(mousex, mousey, 20, WIDTH, HEIGHT)
+        # Add the ball to the array
+        objects.append(ball)
+
+    # |                 |
+    # |  ADD THIS CODE  |
+    # V                 V
+        
+    # When pressing right mouse, remove balls nearby the cursor
+    if right_mouseDown:
+        # Find the mouse&#39;s positoin
+        mousex, mousey = pygame.mouse.get_pos()
+        # Check every ball in the array 
+        for ball in objects:
+            # Convert the mouse position to a Vector2, and find the displacement from the current ball
+            disp = ball.pos - Vector2(mousex, mousey)
+            # If the cursor is close enough to the ball, remove it from the array
+            if disp.length() &lt; ball.radius+BRUSH_SIZE:
+                objects.remove(ball)
+
+    
+    # Iterate through each ball
+    for ball in objects:
+        # Each frame, update each ball and render it
+        ball.update(objects, gravity)
+        pygame.draw.circle(WINDOW, &#34;blue&#34;, (ball.pos.x, ball.pos.y), ball.radius, 1)
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Extra fun stuff pt 2 :)" duration="0">
+        <h2 is-upgraded>Change gravity direction with arrow keys</h2>
+<p>Right now, gravity just points straight down. Let&#39;s let the user change gravity direction by pressing the arrow keys.</p>
+<p>Make this change to the <code>get_input</code> function:</p>
+<pre><code language="language-Python" class="language-Python"># change global variables according to user input
+def get_input(event):
+    # declare external variables
+    global left_mouseDown, right_mouseDown, gravity
+    
+    # update mouse variables when the mouse is pressed or released
+    if event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.MOUSEBUTTONUP:
+        # get an array of all the mouse buttons
+        mouse_buttons = pygame.mouse.get_pressed()
+        # update variables 
+        left_mouseDown = mouse_buttons[0]
+        right_mouseDown = mouse_buttons[2]
+
+    # |                 |
+    # |  ADD THIS CODE  |
+    # V                 V
+        
+    # alter gravity when a key is pressed 
+    elif event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_UP:
+            gravity = Vector2(0, -GRAVITY_STRENGTH)
+        elif event.key == pygame.K_DOWN:
+            gravity = Vector2(0, GRAVITY_STRENGTH)
+        elif event.key == pygame.K_LEFT:
+            gravity = Vector2(-GRAVITY_STRENGTH, 0)
+        elif event.key == pygame.K_RIGHT:
+            gravity = Vector2(GRAVITY_STRENGTH, 0)
+</code></pre>
+<h2 is-upgraded>Turn off gravity</h2>
+<aside class="special"><p> &#34;Screw Gravity&#34; - Saxton Hale</p>
+</aside>
+<p>We can turn off gravity by making the gravity vector <code>(0, 0)</code>. Let&#39;s do this when you press <code>Enter</code>.</p>
+<p>Add this code to the <code>get_input</code> function:</p>
+<pre><code language="language-Python" class="language-Python"># change global variables according to user input
+def get_input(event):
+    # declare external variables
+    global left_mouseDown, right_mouseDown, gravity
+    
+    # update mouse variables when the mouse is pressed or released
+    if event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.MOUSEBUTTONUP:
+        # get an array of all the mouse buttons
+        mouse_buttons = pygame.mouse.get_pressed()
+        # update variables 
+        left_mouseDown = mouse_buttons[0]
+        right_mouseDown = mouse_buttons[2]
+        
+    # alter gravity when a key is pressed 
+    elif event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_UP:
+            gravity = Vector2(0, -GRAVITY_STRENGTH)
+        elif event.key == pygame.K_DOWN:
+            gravity = Vector2(0, GRAVITY_STRENGTH)
+        elif event.key == pygame.K_LEFT:
+            gravity = Vector2(-GRAVITY_STRENGTH, 0)
+        elif event.key == pygame.K_RIGHT:
+            gravity = Vector2(GRAVITY_STRENGTH, 0)
+        elif event.key == pygame.K_RETURN:          # &lt;----- ADD THIS LINE HERE
+            gravity = Vector2(0, 0)                 # &lt;----- ADD THIS LINE HERE
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Optimisation" duration="0">
+        <p>When updating objects, every object has <code>update</code> called one. In every <code>update</code> call, the ball checks every other object in the array for a collision.</p>
+<p>This makes the time complexity of the collision algorithm <img alt="Time Complexity" src="img\\19bb766a7db6ae0d.png">. This is is kind of bad for an algorithm that gets called every frame, especially one where n represents every object in the game.</p>
+<p>What this basically means is that as you add more objects to the simulation, it gets really laggy really fast.</p>
+<h2 is-upgraded>What is to be done?</h2>
+<p>This is related to the <a href="https://en.wikipedia.org/wiki/N-body_problem" target="_blank">&#34;n body problem&#34;</a>, and it&#39;s something that comes up a lot in game dev programming.</p>
+<aside class="special"><p> Can you think of any way to improve the time complexity of this algorithm?</p>
+</aside>
+<p>Aside from improving the time complexity, there are some things that can be done to improve perfomance</p>
+<aside class="warning"><p> An easy optimisation is to code in a language other than Python, but I digress.</p>
+</aside>
+<h2 is-upgraded>Splitting the world into chunks</h2>
+<p>One way to improve performance is to split the world into chunks. For two balls to be colliding, they have to be in the same chunk. Therefore, when checking for collisions, balls only need to check for collisions with the other balls in its chunk, rather than every object in the entire game</p>
+<p class="image-container"><img alt="Chunks Diagram" src="img\\cd0b014456cb9e17.png"></p>
+<aside class="special"><p> Although this doesn&#39;t really improve time complexity at all, it&#39;ll improve performance, because most of the time, most balls will have to perform a lot less checks than they otherwise would have to, since most OTHER balls will not inhabit the same chunk as it.</p>
+</aside>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="HOORAY YOU DID IT!!!" duration="0">
+        <p class="image-container"><img alt="Solly gif" src="img\\44f356558033e250.gif"></p>
+<p>This is probably one of the most complicated workshops we&#39;ve done, so thanks for seeing it through! Hopefully you learned something new today :)</p>
+<p>Be sure to check in!! Solly needs to EAT and we need club funding to feed him!!!!!</p>
+
+
+      </google-codelab-step>
+    
+  </google-codelab>
+
+  <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+</html>
