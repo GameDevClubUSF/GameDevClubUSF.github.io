@@ -1,0 +1,220 @@
+
+<!doctype html>
+
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>Godot First Person Player Controller</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+  <google-codelab codelab-gaid=""
+                  codelab-ga4id=""
+                  id="FirstPersonPlayerController"
+                  title="Godot First Person Player Controller"
+                  environment="web"
+                  feedback-link="https://github.com/SolaceDev/solace-dev-codelabs/blob/master/markdown/FirstPersonPlayerController">
+    
+      <google-codelab-step label="What you&#39;ll learn: Overview" duration="5">
+        <h2 is-upgraded>Table of Contents</h2>
+<ol type="1">
+<li>Overview</li>
+<li>Installing Godot and creating a new project</li>
+<li>Create new &#34;World&#34; Scene</li>
+<li>Creating Player Node</li>
+<li>Add lighting</li>
+<li>Input Mapping</li>
+<li>Scripting the Player Node</li>
+<li>Making it better</li>
+<li>FINISH</li>
+</ol>
+<h2 is-upgraded>Finished Project</h2>
+<p class="image-container"><img alt="Soly Image Caption" src="img\\b9bc4d29404f31e7.gif"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Installing Godot and creating a new project" duration="5">
+        <h2 is-upgraded>Download Godot</h2>
+<p><a href="https://godotengine.org/download/" target="_blank">Click Here</a> to Dowload Godot</p>
+<h2 is-upgraded>Run the correct Godot</h2>
+<p class="image-container"><img alt="Run the exe" src="img\\1b53f8f915b0aed9.jpeg"></p>
+<h2 is-upgraded>Create a new project</h2>
+<p class="image-container"><img alt="New Project 1" src="img\\1f81be471a2eacf2.jpg"></p>
+<p class="image-container"><img alt="New Project 2" src="img\\be1a8815bfdf358b.jpg"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Create new &#34;World&#34; Scene" duration="3">
+        <h2 is-upgraded>Create a new 3D Scene</h2>
+<p class="image-container"><img alt="New World 1" src="img\\801ba5235c7bdb0b.jpg"></p>
+<h2 is-upgraded>Create a new floor, Add Static Body and Mesh</h2>
+<p class="image-container"><img alt="New World 2" src="img\\2987806c41343089.jpg"></p>
+<h2 is-upgraded>Assign Mesh to plane mesh and increase the size</h2>
+<p class="image-container"><img alt="New World 3" src="img\\8bf6a874e1a8408a.jpg"></p>
+<p class="image-container"><img alt="New World 4" src="img\\c0245b3c414d08c5.jpg"></p>
+<h2 is-upgraded>Adding a Collider to the mesh</h2>
+<p class="image-container"><img alt="New World 5" src="img\\972acf9ebd90ad5c.jpg"></p>
+<p class="image-container"><img alt="New World 6" src="img\\74eadcadb4ccca04.jpg"></p>
+<p class="image-container"><img alt="New World 7" src="img\\ca49be93d07cd3a3.jpg"></p>
+<h2 is-upgraded>Run the program with F5 and assign world as the main Scene</h2>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Creating Player Node" duration="4">
+        <h2 is-upgraded>Create a new Scene</h2>
+<p class="image-container"><img alt="Create Player 1" src="img\\6d03adfb9b62f741.jpg"></p>
+<h2 is-upgraded>Add CharacterBody3D Node as main Node to the Scene</h2>
+<p class="image-container"><img alt="Create Player 2" src="img\\35d3e37d3fafa92b.jpg"></p>
+<h2 is-upgraded>Give the CharacterBody3D a Capsule Mesh and Collision Shape</h2>
+<p class="image-container"><img alt="Create Player 3" src="img\\83dafbe3a803bde9.jpg"></p>
+<h2 is-upgraded>Assign a Capsule shae to the collider</h2>
+<p class="image-container"><img alt="Create Player 4" src="img\\83d264b7734e3153.jpg"></p>
+<h2 is-upgraded>Add a Camera Node</h2>
+<p class="image-container"><img alt="Create Player 5" src="img\\e8c5c02bfad2676f.jpg"></p>
+<h2 is-upgraded>Link it to the World Scene</h2>
+<p class="image-container"><img alt="Create Player 6" src="img\\33e324e2f51e0ce.jpg"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Add lighting" duration="3">
+        <h2 is-upgraded>Add WorldEnviorment and DirectionLight3D to the world Scene</h2>
+<p class="image-container"><img alt="Enviorment lighting 1" src="img\\c9c3590a9dfa402f.jpg"></p>
+<h2 is-upgraded>Create a new Enviorment</h2>
+<p class="image-container"><img alt="Enviorment lighting 2" src="img\\e2a7d930ab029ea9.jpg"></p>
+<p class="image-container"><img alt="Enviorment lighting 3" src="img\\b3bd82864513cab.jpg"></p>
+<h2 is-upgraded>In DirectionLight3D Node enable shadows and adjust the rotation transform</h2>
+<p class="image-container"><img alt="Enviorment lighting 4" src="img\\68871c2357333b4b.jpg"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Input Mapping" duration="3">
+        <h2 is-upgraded>Add new acrions to input map</h2>
+<p class="image-container"><img alt="Input Mapping 1" src="img\\4fc37b04242aed51.jpg"></p>
+<h2 is-upgraded>Attach a new Script to the Player Scene</h2>
+<p class="image-container"><img alt="Input Mapping 2" src="img\\74893922f6c3f022.jpg"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Scripting the Player Node" duration="10">
+        <h2 is-upgraded>Change the default Inputs to the new inputs we made in Input Mapping actions</h2>
+<p>Adjust line 14 and 19 to our needs (Inside func _input())</p>
+<pre><code>    # Handle jump.
+	if Input.is_action_just_pressed(&#34;player_jump&#34;) and is_on_floor():
+		velocity.y = JUMP_VELOCITY
+
+	# Get the input direction and handle the movement/deceleration.
+	# As good practice, you should replace UI actions with custom gameplay actions.
+	var input_dir := Input.get_vector(&#34;player_left&#34;, &#34;player_right&#34;, &#34;player_forward&#34;, &#34;player_back&#34;)
+	var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+</code></pre>
+<h2 is-upgraded>Add _ready function to lock mouse on start</h2>
+<p>The function call will be called by the game engine on ready</p>
+<pre><code>func _ready() -&gt; void:
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+</code></pre>
+<h2 is-upgraded>Create new var ‘MOUSE_SENSETIVITY&#39; at top and add _process function and wait for pause input to toggle mouse when pause button is pressed</h2>
+<pre><code># Top of the Script
+extends CharacterBody3D
+
+
+const SPEED = 5.0
+const JUMP_VELOCITY = 4.5
+const MOUSE_SENSETIVITY = 0.1 	#ADDED CODE
+
+...
+...
+...
+
+func _process(delta: float) -&gt; void:
+	if Input.is_action_just_pressed(&#34;pause&#34;):
+		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+			Input.mouse_mode =Input.MOUSE_MODE_VISIBLE
+		else:
+			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+</code></pre>
+<h2 is-upgraded>Add _input function and get Mouse Inputs to get look direction</h2>
+<pre><code>func _input(event: InputEvent) -&gt; void:
+	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+		if event is InputEventMouseMotion:
+			rotation_degrees.x -= event.relative.y * MOUSE_SENSETIVITY
+			rotation_degrees.y -= event.relative.x * MOUSE_SENSETIVITY
+			rotation_degrees.x = clamp(rotation_degrees.x, -90.0, 90.0)
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Making it better" duration="10">
+        <h2 is-upgraded>We finished the most basic player Controller</h2>
+<p>You may notice that it feels bad and not fun to use. The reason for this is because there is not inertia in the controller right, main cause of this, is that the default Godot CharacterBody3D is a little scuffed.</p>
+<pre><code>    var input_dir := Input.get_vector(&#34;player_left&#34;, &#34;player_right&#34;, &#34;player_forward&#34;, &#34;player_back&#34;)
+    var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+	
+    # START OF NEW CODE
+
+    if is_on_floor():	# ADDED IF STATEMENT FOR AIR CONTROLS
+		if direction:
+			velocity.x = direction.x * SPEED
+			velocity.z = direction.z * SPEED
+		else:
+			# CHANGED CODE HERE FOR ACTUAL WORKING SLOWING (because godot template was scuffed) (ADDED CODE)
+			velocity.x = lerp(velocity.x, direction.x * SPEED, delta * 4.0)
+			velocity.z = lerp(velocity.z, direction.z * SPEED, delta * 4.0)
+	# ADDED CODE
+    else:	
+		velocity.x = lerp(velocity.x, direction.x * SPEED, delta * 3.0)
+		velocity.z = lerp(velocity.z, direction.z * SPEED, delta * 3.0)
+
+
+    # END OF NEW CODE STUFF
+	move_and_slide()
+</code></pre>
+<h2 is-upgraded>Jump buffering (adjust the jump input)</h2>
+<p>From: <code>Input.is_action_just_pressed("player_jump")</code><br> To: <code>Input.is_action_pressed("player_jump")</code></p>
+<pre><code>	# Handle jump.
+	if Input.is_action_pressed(&#34;player_jump&#34;) and is_on_floor():
+		velocity.y = JUMP_VELOCITY
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="FINISH" duration="1">
+        <p>✅ Now you have a very basic Godot Player Controller<br> ✅ Next workshop we will make a primitive First Person Shooter using this controller<br> ✅ Please make sure to check-in</p>
+<p class="image-container"><img alt="Soly Image Caption" src="img\\44f356558033e250.gif"></p>
+<p>Thanks for participating in this codelab!<br> And to our newcomers this seal is Solly. He is our current unofficial club mascot.<br> His lore is that he works for a AAA game company. As such, by logical implicit stance (A.K.A Modus Ponens)</p>
+<p>p -&gt; q, p ∴ q<br> let p = AAA company  S̶l̶a̶v̶e employee<br> let q = Depression and basement dweller</p>
+<p>To help Solly cope from this depression we require funding from USF and the only way we can request for funding is by proving we are an impactful club.<br> One proof of being an impactful club is club attendance/participation, so please don&#39;t forget to check in on BullsConnect.</p>
+
+
+      </google-codelab-step>
+    
+  </google-codelab>
+
+  <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+</html>

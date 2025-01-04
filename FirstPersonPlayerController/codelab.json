@@ -1,0 +1,22 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2025-01-05T00:28:03+08:00",
+  "id": "FirstPersonPlayerController",
+  "duration": 44,
+  "title": "Godot First Person Player Controller",
+  "summary": "",
+  "source": "FirstPersonPlayerController.md",
+  "theme": "",
+  "status": [
+    "published"
+  ],
+  "category": null,
+  "tags": [
+    "web"
+  ],
+  "feedback": "https://github.com/SolaceDev/solace-dev-codelabs/blob/master/markdown/FirstPersonPlayerController",
+  "url": "FirstPersonPlayerController"
+}
