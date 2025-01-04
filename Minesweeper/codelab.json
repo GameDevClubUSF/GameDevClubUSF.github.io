@@ -1,0 +1,22 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2025-01-04T16:07:25-05:00",
+  "id": "Minesweeper",
+  "duration": 0,
+  "title": "Minesweeper",
+  "summary": "",
+  "source": "Minesweeper.md",
+  "theme": "",
+  "status": [
+    "published"
+  ],
+  "category": null,
+  "tags": [
+    "web"
+  ],
+  "feedback": "https://github.com/bustlingbungus/Codelabs-Baseplate/tree/Minesweeper",
+  "url": "Minesweeper"
+}

@@ -1,0 +1,1313 @@
+
+<!doctype html>
+
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>Minesweeper</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+  <google-codelab codelab-gaid=""
+                  codelab-ga4id=""
+                  id="Minesweeper"
+                  title="Minesweeper"
+                  environment="web"
+                  feedback-link="https://github.com/bustlingbungus/Codelabs-Baseplate/tree/Minesweeper">
+    
+      <google-codelab-step label="Overview" duration="0">
+        <h2 is-upgraded>Table Of Contents</h2>
+<ol type="1">
+<li>This page</li>
+<li>Environment setup</li>
+<li>File downloads/pygame baseplate</li>
+<li>Cell class definition</li>
+<li>2D Array of Cells</li>
+<li>Accessing Surrounding Cells</li>
+<li>Counting Adjacent Bombs</li>
+<li>Revealing a Cell</li>
+<li>Rendering Cells (part 1)</li>
+<li>Rendering Cells (part 2)</li>
+<li>Creating Grid of Cells</li>
+<li>Rendering the Game</li>
+<li>Calling Functions in main</li>
+<li>Left Click to Reveal</li>
+<li>Bomb Count Fix</li>
+<li>Right Click to Add a Flag</li>
+<li>Lose Condition</li>
+<li>Win Condition</li>
+<li>Breaking the Board</li>
+<li>Improved Colouring (extra)</li>
+<li>Revealing grid on Game End (extra)</li>
+<li>Resetting the Game (extra)</li>
+<li>Conclusion</li>
+</ol>
+<h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
+<p>In this CodeLab, you&#39;ll learn how to code the classic Minesweeper game using pygame. More importantly, you&#39;ll learn about Python class definitions, organising game objects in a 2D array, and organising Python projects across multiple files.</p>
+<h2 is-upgraded>Final Game:</h2>
+<p class="image-container"><img alt="Final Minesweeper Game" src="img\\202cdd0f4e240458.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Setting Up Environment" duration="0">
+        <h2 is-upgraded>VSCode and Python</h2>
+<p>We will be using VSCode to create the Python code for this project. These can be downloaded here:</p>
+<ul>
+<li><a href="https://code.visualstudio.com/download" target="_blank">VSCode</a></li>
+<li><a href="https://www.python.org/downloads/" target="_blank">Python</a></li>
+</ul>
+<aside class="special"><p> If you use some IDE other than VSCode, that should be fine!</p>
+</aside>
+<h2 is-upgraded>Make sure to check this box here:</h2>
+<p class="image-container"><img alt="Python Instruction" src="img\\fec1919449fdd977.png"></p>
+<h2 is-upgraded>Pygame</h2>
+<p>This project will use an API called <code>pygame</code> to create a window and render things onto it. To get pygame, just type the following command in a VSCode terminal:</p>
+<p>For Windows:</p>
+<pre><code language="language-bash" class="language-bash">py -m pip install -U pygame --user
+</code></pre>
+<p>For Mac:</p>
+<pre><code language="language-bash" class="language-bash">python3 -m pip install -U pygame --user
+</code></pre>
+<p>Create a new folder on your computer for this project, and open it in VSCode.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Get Project Baseplate" duration="0">
+        <p>Download the baseplate files for this project <a href="https://drive.google.com/file/d/1CjUvyzGQz7cn7O13nAkKgWaxJavK40ij/view?usp=sharing" target="_blank">here</a>. Extract this file anywhere, and open the extracted folder in VSCode.</p>
+<p class="image-container"><img alt="The folder opened in VSCode" src="img\\9baeaac96f081cff.png"></p>
+<p>The folder will contain three .py files, <code>main</code>, <code>Cell</code>, and <code>Functions</code>. It will also contain two .png images, and one .ttf font. These are the assets we will use for Minesweeper.</p>
+<p><code>main.py</code> contains some code for opening a window with pygame. When creating the game, this will be the file that we actually run.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Begin Defining the Cell Class" duration="0">
+        <p>Minesweeper will consist of a grid of cells. Each cell can either be a bomb or safe. A cell can also be revealed or not revealed, and it can have a flag, or not have a flag. Additionally, our cells will contain their (x,y) coordinate in the grid.</p>
+<p>Our cells will have a counter for how many bombs are adjacent to them, and if a cell IS a bomb, then this counter will be set to -1 to represent this.</p>
+<p>Go to <code>Cell.py</code>, and begin defining a <code>Cell</code> class, like so:</p>
+<pre><code language="language-Python" class="language-Python"># A single cell on the minsweeper board
+class Cell:
+
+    # Initialise cell x and y indices, and whether the cell is a bomb
+    # Initialise whether the cell is revealed, and whether ir contains a flag
+    def __init__(self, isBomb, x, y):
+        # If the cell is a bomb, make surrounding bombs -1
+        if isBomb:
+            self.surrounding_bombs = -1
+        else:
+            self.surrounding_bombs = 0
+            
+        self.revealed = False
+        self.flagged = False
+        
+        # x and y represent the indices of the cell
+        self.x, self.y = x, y
+</code></pre>
+<p>To make life easier, let&#39;s define a function to tell if a cell is a bomb, like this:</p>
+<pre><code language="language-Python" class="language-Python"># A single cell on the minsweeper board
+class Cell:
+
+    # Initialise cell x and y indices, and whether the cell is a bomb
+    # Initialise whether the cell is revealed, and whether ir contains a flag
+    def __init__(self, isBomb, x, y):
+        # If the cell is a bomb, make surrounding bombs -1
+        if isBomb:
+            self.surrounding_bombs = -1
+        else:
+            self.surrounding_bombs = 0
+            
+        self.revealed = False
+        self.flagged = False
+        
+        # x and y represent the indices of the cell
+        self.x, self.y = x, y
+
+    # |                     |
+    # |  ADD THIS FUNCTION  |
+    # V                     V
+
+    def isBomb(self):
+        return self.surrounding_bombs == -1
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Create Grid of Cells" duration="0">
+        <p>We&#39;ve defined an individual cell in the minesweeper grid, but we need a way to contain a bunch of cells. We&#39;re going to use a 2D array, to contain columns and rows of cells.</p>
+<p>Go to <code>Functions.py</code>, and define these variables to create a 2D array of Cells:</p>
+<pre><code language="language-Python" class="language-Python">import pygame, math, random
+#import cell class
+from Cell import *
+
+# turn on pygame
+pygame.init()
+
+# window dimensions
+WIDTH, HEIGHT = 600, 600
+
+# |                      |
+# |  ADD THIS CODE HERE  |
+# V                      V
+
+# minesweeper grid dimensions
+NX, NY = 10, 10
+# side length of each cell
+CELL_SIZE = WIDTH / NX
+# array of all cells
+cells = [[Cell(False,0,0) for i in range(NY)] for j in range(NX)]
+
+
+# Create the window and fonts
+WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Changes to Cell Class" duration="0">
+        <p>Now that there&#39;s a container for all cells, we can start making some more code for the cells themselves.</p>
+<h2 is-upgraded>Why do cells need to look at each other?</h2>
+<aside class="warning"><p> to count how many bombs are adjacent to themselves</p>
+</aside>
+<p>Start by making a function for cells to get the cells surrounding themselves. The surrounding cells will be all the (x, y) cooridinates i unit away from the cell&#39;s coordinates (as long as x and y are in bounds)</p>
+<p>Go to <code>Cell.py</code>, and add this function:</p>
+<pre><code language="language-Python" class="language-Python"># A single cell on the minsweeper board
+class Cell:
+
+    def __init__(self, isBomb, x, y):
+        ...
+
+    def isBomb(self):
+        ...
+
+    # |                          |
+    # |  ADD THIS FUNCTION HERE  |
+    # V                          V
+
+    # Gets a list of the cells surrounding this one
+    def surrounding(self):
+        # import array from functions
+        from Functions import cells, NX, NY
+        surrounding = []
+        
+        # iterate through the 8 cells surrounding (x, y)
+        # skip if the cell is out of bounds, or if the cell *is* (x, y)
+        for i in range(self.x-1, self.x+2):
+            if not 0&lt;=i&lt;NX: # cell out of bounds
+                continue
+            for j in range(self.y-1, self.y+2):
+                if (not 0&lt;=j&lt;NY) or (j==self.y and i==self.x):
+                    continue
+                # Add the cell to the surorounding arry
+                surrounding.append(cells[i][j])
+        # return the array of surrounding cells
+        return surrounding
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Make Cells Count Bombs" duration="0">
+        <p>Now that cells can access their neighbours, there needs to be a way for them to see how many of said neighbours are bombs. This value will be saved to the cell&#39;s <code>surrounding_bombs</code> variable</p>
+<p>Add this function to the <code>Cell</code> class:</p>
+<pre><code language="language-Python" class="language-Python"># A single cell on the minsweeper board
+class Cell:
+
+    def __init__(self, isBomb, x, y):
+        ...
+
+    def isBomb(self):
+        ...
+
+    def surrounding(self):
+        ...
+
+    # |                          |
+    # |  ADD THIS FUNCTION HERE  |
+    # V                          V
+
+    # counts the number of surrounding cells that are bombs
+    def countSurrounding(self):
+        # do nothing if the cell is a bomb
+        if not self.isBomb():
+            # reset bomb counter to 0
+            self.surrounding_bombs = 0
+            # for each bomb in surrounding cells, increment the bomb counter
+            for cell in self.surrounding():
+                if cell.isBomb():
+                    self.surrounding_bombs += 1
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Revealing a Cell" duration="0">
+        <p>In minesweeper when  you left click a cell, it gets revealed so you can see how many bombs are around the cell.</p>
+<aside class="warning"><p> If a cell has zero bombs surrounding it, then it should reveal all the surrounding cells.</p>
+</aside>
+<p>Add this reveal function to the <code>Cell</code> class:</p>
+<pre><code language="language-Python" class="language-Python"># A single cell on the minsweeper board
+class Cell:
+
+    def __init__(self, isBomb, x, y):
+        ...
+
+    def isBomb(self):
+        ...
+
+    def surrounding(self):
+        ...
+
+    def countSurrounding(self):
+        ...
+
+    # |                          |
+    # |  ADD THIS FUNCTION HERE  |
+    # V                          V
+
+    # Makes the cell revealed. If the cells has 0 surrounding bombs, 
+    # reveals all adjacent cells
+    def reveal(self):
+        # make the cell revealed
+        self.revealed = True
+        # If there are not surrounding bombs, reveal all surrounding
+        if self.surrounding_bombs == 0:
+            for cell in self.surrounding():
+                if not cell.revealed:
+                    cell.reveal()
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Rendering Cells Part 1" duration="0">
+        <p>Rendering the cell comes in three parts:</p>
+<ol type="1">
+<li>Checking if the cell is revealed or not</li>
+<li>Rendering the cell background</li>
+<li>Rendering cell images <ul>
+<li>If the cell is flagged, this means rendering a flag. If its&#39;revealed, it means rendering the number of surrounding bombs, or a bomb if the cell is a bomb</li>
+</ul>
+</li>
+</ol>
+<aside class="special"><p> The cells will be rendered at a position based on it&#39;s (x, y) coordinates in the grid, as well as the cell side length</p>
+</aside>
+<p>We&#39;re going to need to load images for a bomb and flag to render, as well as a font for showing the surrounding bombs count. Go to <code>Functions.py</code> and add these three lines:</p>
+<pre><code language="language-Python" class="language-Python">&#39;&#39;&#39; Functions.py &#39;&#39;&#39;
+import pygame, math, random
+#import cell class
+from Cell import *
+
+...
+
+# array of all cells
+cells = [[Cell(False,0,0) for i in range(NY)] for j in range(NX)]
+
+# Create the window
+WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
+
+
+# |                        |
+# |  ADD THESE LINES HERE  |
+# V                        V
+
+# Font for surrounding bombs
+FONT = pygame.font.Font(&#34;PixelFont.ttf&#34;, int(CELL_SIZE/2))
+# Textures for flag and bomb, scaled to match cell dimensions
+FLAG = pygame.transform.scale(pygame.image.load(&#34;flag.png&#34;), (CELL_SIZE,CELL_SIZE))
+BOMB = pygame.transform.scale(pygame.image.load(&#34;bomb.png&#34;), (CELL_SIZE,CELL_SIZE))
+</code></pre>
+<p>With these loaded, go back to <code>Cell.py</code> to add the <code>render</code> function to the <code>Cell</code> class:</p>
+<pre><code language="language-Python" class="language-Python">&#39;&#39;&#39; Cell.py &#39;&#39;&#39;
+# A single cell on the minsweeper board
+class Cell:
+    def __init__(self, isBomb, x, y):
+        ...
+    def isBomb(self):
+        ...
+    def surrounding(self):
+        ...
+    def countSurrounding(self):
+        ...
+    def reveal(self):
+        ...
+    
+    # |                          |
+    # |  ADD THIS FUNCTION HERE  |
+    # V                          V
+
+    # Renders the cell onto the screen
+    def render(self):
+        # get required variables from functions
+        from Functions import WINDOW, FONT, CELL_SIZE, FLAG, BOMB
+        # Set up a rect to represent the cell&#39;s space on the window
+        rect = pygame.Rect(self.x*CELL_SIZE, self.y*CELL_SIZE, CELL_SIZE, CELL_SIZE)
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Rendering Cells Part 2" duration="0">
+        <h2 is-upgraded>Steps 1 and 2</h2>
+<p>As mentioned before, there will be three steps to cell rendering. Let&#39;s implement the first two,</p>
+<aside class="special"><p> Checking if the cell is revealed or not, and Rendering the cell background.</p>
+</aside>
+<p>We&#39;ll render a darker background for hidden cells, and a lighter one for revealed cells</p>
+<p>Add this code to the <code>render</code> function we just made:</p>
+<pre><code language="language-Python" class="language-Python"># Renders the cell onto the screen
+def render(self):
+    # get required variables from functions
+    from Functions import WINDOW, FONT, CELL_SIZE, FLAG, BOMB
+    # Set up a rect to represent the cell&#39;s space on the window
+    rect = pygame.Rect(self.x*CELL_SIZE, self.y*CELL_SIZE, CELL_SIZE, CELL_SIZE)
+
+    # |                      |
+    # |  ADD THIS CODE HERE  |
+    # V                      V
+
+    # If the cells is revealed, show the number of surrounding bombs, or,
+    # if the cell IS a bomb, render the bomb image
+    if self.revealed:
+        # render cell background
+        pygame.draw.rect(WINDOW, (170,170,170), rect)
+
+    # If the cell ISN&#39;T revealed, just render the cell backgorund
+    # if the cell has a flag, render the flag image
+    else:
+        pygame.draw.rect(WINDOW, (90,90,90), rect)
+</code></pre>
+<h2 is-upgraded>Step 3</h2>
+<p>And for the final step:</p>
+<aside class="special"><p> Rendering cell images</p>
+</aside>
+<p>If the cell is flagged, this means rendering a flag. If its&#39;revealed, it means rendering the number of surrounding bombs, or a bomb if the cell is a bomb.</p>
+<p>Add this code in the <code>render</code> function:</p>
+<pre><code language="language-Python" class="language-Python"># Renders the cell onto the screen
+def render(self):
+    # get required variables from functions
+    from Functions import WINDOW, FONT, CELL_SIZE, FLAG, BOMB
+    # Set up a rect to represent the cell&#39;s space on the window
+    rect = pygame.Rect(self.x*CELL_SIZE, self.y*CELL_SIZE, CELL_SIZE, CELL_SIZE)
+
+
+    # If the cells is revealed, show the number of surrounding bombs, or,
+    # if the cell IS a bomb, render the bomb image
+    if self.revealed:
+        # render cell background
+        pygame.draw.rect(WINDOW, (170,170,170), rect)
+
+        # |                      |
+        # |  ADD THIS CODE HERE  |
+        # V                      V
+
+        # render bomb image if the cell is a bomb
+        if self.isBomb():
+            WINDOW.blit(BOMB, rect)
+        # Render a number for the surrounding bomb count
+        elif self.surrounding_bombs &gt; 0:
+            num = FONT.render(str(self.surrounding_bombs), True, (0,0,0))
+            num_rect = num.get_rect(center=(rect.x+rect.w/2,rect.y+rect.h/2))
+            WINDOW.blit(num, num_rect)
+
+    # If the cell ISN&#39;T revealed, just render the cell backgorund
+    # if the cell has a flag, render the flag image
+    else:
+        pygame.draw.rect(WINDOW, (90,90,90), rect)
+
+        # |                      |
+        # |  ADD THIS CODE HERE  |
+        # V                      V
+
+        if self.flagged:
+                WINDOW.blit(FLAG, rect)
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Creating the Grid" duration="0">
+        <p>Wow, that was a lot of &#34;defining the cell class&#34; just to not add anything into the game. Let&#39;s finally create the grid to play Minesweeper!</p>
+<p>We&#39;ll need two functions, one to create the grid, and one helper to decide if each cell will be a bomb.</p>
+<h2 is-upgraded>Bomb Checking Function</h2>
+<p>We&#39;ll have a 25% chance for each cell to be a bomb. So, for this function, we&#39;ll create a random number between 0 and 1, and if it&#39;s less than o.25 (a 25%), return true.</p>
+<p>Add this function to <code>Functions.py</code>:</p>
+<pre><code language="language-Python" class="language-Python">&#39;&#39;&#39; Functions.py &#39;&#39;&#39;
+import pygame, math, random
+#import cell class
+from Cell import *
+
+...
+
+# Font for surrounding bombs
+FONT = pygame.font.Font(&#34;PixelFont.ttf&#34;, int(CELL_SIZE/2))
+# Textures for flag and bomb, scaled to match cell dimensions
+FLAG = pygame.transform.scale(pygame.image.load(&#34;flag.png&#34;), (CELL_SIZE,CELL_SIZE))
+BOMB = pygame.transform.scale(pygame.image.load(&#34;bomb.png&#34;), (CELL_SIZE,CELL_SIZE))
+
+# |                       |
+# |  ADD THIS STUFF HERE  |
+# V                       V
+
+##############################
+#                            #
+#      GRID MANAGEMENT       #
+#                            #
+##############################
+
+def rollForBomb():
+    # If the bomb roll is successful, return true
+    if random.uniform(0, 1) &lt; 0.25:
+        return True
+    return False
+</code></pre>
+<h2 is-upgraded>Grid Creation Function</h2>
+<p>We&#39;ll create the grid by iterating through each item in the <code>cells</code> array, and creating a new cell to in that spot.</p>
+<p>Add this <code>createGrid()</code> function:</p>
+<pre><code language="language-Python" class="language-Python">##############################
+#                            #
+#      GRID MANAGEMENT       #
+#                            #
+##############################
+
+def rollForBomb():
+    ...
+
+# |                          |
+# |  ADD THIS FUNCTION HERE  |
+# V                          V
+
+def createGrid():
+    global cells
+
+    # re-initialise the grid with new cells
+    cells = [[Cell(rollForBomb(), j, i) for i in range(NY)] for j in range(NX)]
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Rendering the Game" duration="0">
+        <p>We defined a function for rendering cells, so we just need a way to iterate through all of our cells and render each one. We&#39;re also going to render some gridlines to make it easier to distinguish individual cells.</p>
+<p>Adds these three functions to <code>Functions.py</code>:</p>
+<pre><code language="language-Python" class="language-Python">&#39;&#39;&#39; Functions.py &#39;&#39;&#39;
+
+def rollForBomb():
+    ...
+def createGrid():
+    ...
+
+# |                       |
+# |  ADD THIS STUFF HERE  | 
+# V                       V
+
+##############################
+#                            #
+#    RENDERING FUNCTIONS     #
+#                            #
+##############################
+
+
+# render all cells in the grid
+def renderCells():
+    for row in cells:
+        for cell in row:
+            cell.render()
+            
+# renders all the grid lines
+def renderGrid():
+    # render vertical gridlines
+    line = pygame.Rect(0, 0, 3, HEIGHT)
+    for i in range(NX):
+        line.x = CELL_SIZE * i
+        pygame.draw.rect(WINDOW, (75,75,75), line)
+        
+    # render horizontal gridlines
+    line = pygame.Rect(0, 0, WIDTH, 3)
+    for i in range(NY):
+        line.y = CELL_SIZE * i
+        pygame.draw.rect(WINDOW, (75,75,75), line)
+
+# This one is just to make life easier 
+def render():
+    # call rendering helper functions 
+    renderCells()
+    renderGrid()
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Adding functions to main" duration="0">
+        <p>Now that there&#39;s a way to create the grid and render it, we can finally have the game show up in the actual window. Only 13 pages to add anything into the window, better late than never!</p>
+<p>Make these changes in <code>main.py</code></p>
+<pre><code language="language-Python" class="language-Python">&#39;&#39;&#39; main.py &#39;&#39;&#39;
+import pygame, sys
+# Import game code
+from Cell import *
+from Functions import *
+
+createGrid()                # &lt;----- ADD THIS LINE HERE
+
+quit_app = False
+
+# Main window loop
+while not quit_app:
+    
+    # Handle inputs
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            quit_app = True
+    
+    # Clear window
+    WINDOW.fill(&#34;black&#34;)
+    
+    render()                # &lt;----- ADD THIS LINE HERE
+    
+    # update the display
+    pygame.display.update()
+    
+# close the application
+pygame.quit()
+sys.exit()
+</code></pre>
+<aside class="warning"><p> Fun fact, this is 50% of the code we&#39;ll be adding to <code>main.py</code> in this entire project!</p>
+</aside>
+<h2 is-upgraded>Run main</h2>
+<p>If you run <code>main.py</code>, you should see this window now:</p>
+<p class="image-container"><img alt="Current Minesweeper Window" src="img\\2de3d71a743e8479.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Left Clicking" duration="0">
+        <p>Right now, this game is pretty lame since all the cells are hidden, since you can&#39;t left click anything to reveal them.</p>
+<p>When you left click, we need to do 2 things:</p>
+<ol type="1">
+<li>Find what cell you clicked on</li>
+<li>Reveal that cell</li>
+</ol>
+<aside class="warning"><p> Technically it&#39;s three things, since if the cell revealed is a bomb you should lose the game, but we&#39;ll get to that later.</p>
+</aside>
+<aside class="warning"><p> When clicking on a cell, it should be revealed only if it DOESN&#39;T have a flag.</p>
+</aside>
+<p>Since the cells split the window perfectly into <code>CELL_SIZE</code> sized squares, we can convert (x, y) coordinates on the window to array indices by just dividing x and y by <code>CELL_SIZE</code>.</p>
+<p>Add these two functions in <code>Functions.py</code>:</p>
+<pre><code language="language-Python" class="language-Python">&#39;&#39;&#39; Functions.py &#39;&#39;&#39;
+
+def rollForBomb():
+    ...
+def createGrid():
+    ...
+
+# |                       |
+# |  ADD THIS STUFF HERE  | 
+# V                       V
+
+##############################
+#                            #
+#      INPUT FUNCTIONS       #
+#                            #
+##############################
+
+# left click on the (x,y) coordinates
+# left clicking reveals non flagged cells
+def leftClick(x, y):
+    
+    # convert the mouse position to cell indices
+    cx, cy = int(x/CELL_SIZE), int(y/CELL_SIZE)
+    # return if either index is out of bounds  
+    if not (0&lt;=cx&lt;NX and 0&lt;=cy&lt;NY):
+        return
+    
+    # reveal cells that get clicked, don&#39;t reveal flagged cells
+    cell = cells[cx][cy]
+    if not cell.flagged:
+        cell.reveal()
+
+# Gets user input 
+def getInput(event):
+    # when left/right clicking, get mouse position, and call the appropriate function
+    if event.type == pygame.MOUSEBUTTONDOWN:
+        # get mouse positions and which buttons are active
+        mousex, mousey = pygame.mouse.get_pos()
+        mouse_buttons = pygame.mouse.get_pressed()
+        if mouse_buttons[0]:
+            leftClick(mousex, mousey)
+</code></pre>
+<h2 is-upgraded>Calling in main</h2>
+<p>Now, go to <code>main.py</code>, and add this line to call the input function:</p>
+<pre><code language="language-Python" class="language-Python">&#39;&#39;&#39; main.py &#39;&#39;&#39;
+...
+
+# Main window loop
+while not quit_app:
+    
+    # Handle inputs
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            quit_app = True
+        else:                       # &lt;----- ADD THIS LINE HERE
+            getInput(event)         # &lt;----- ADD THIS LINE HERE
+    
+    # Clear window
+    WINDOW.fill(&#34;black&#34;)
+...
+</code></pre>
+<aside class="warning"><p> Fun fact, this is the last change we will make to main.py</p>
+</aside>
+<p>Now, when you click on a cell, something like this should happen:</p>
+<p class="image-container"><img alt="None of the bombs have counter their neighbours" src="img\\d991dd1c725dccbd.png"></p>
+<p>This is happening because none of the cells have had their <code>countSurrounding</code> function called anywhere, so all the non-bomb cells think they have zero surrounding bombs, and reveal their neighbours when they get revealed.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Fixing bomb counts" duration="0">
+        <p>When creating the grid, let&#39;s call a new function, called <code>breakBoard</code> (the name will make sense later), to make all the cells count their neighbours when the grid is created.</p>
+<p>Make these changes in <code>Funcitons.py</code>:</p>
+<pre><code language="language-Python" class="language-Python">&#39;&#39;&#39; Functions.py &#39;&#39;&#39;
+##############################
+#                            #
+#      GRID MANAGEMENT       #
+#                            #
+##############################
+
+# |                          |
+# |  ADD THIS FUNCTION HERE  | 
+# V                          V
+
+def breakBoard():
+    # iterate through each cell, and update the cell&#39;s surrounding count
+    for x in range(NX):
+        for y in range(NY):
+            cells[x][y].countSurrounding()
+
+def rollForBomb():
+    ...
+
+def createGrid():
+    global cells
+
+    # re-initialise the grid with new cells
+    cells = [[Cell(rollForBomb(), j, i) for i in range(NY)] for j in range(NX)]
+
+    breakBoard()        # &lt;----- ADD THIS LINE HERE
+</code></pre>
+<p>NOW when you run <code>main.py</code>, if you left click on a cell it should reveal it as expected:</p>
+<p class="image-container"><img alt="The Game actually kind of working" src="img\\811710d81015941c.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Right Clicking" duration="0">
+        <p>When right clicking on a cell, if it&#39;s not revealed we should add a flag if it has none, or remove a flag if it already does. In other words, we&#39;re going to toggle the flag</p>
+<aside class="warning"><p> Like left clicking, there should also be a condition where if you flag all bombs you win, but this will also be handled later</p>
+</aside>
+<p>We can find the cell clicked on the same way we did for left clicking, so add this code to <code>Functions.py</code>:</p>
+<pre><code language="language-Python" class="language-Python">&#39;&#39;&#39; Functions.py &#39;&#39;&#39;
+...
+
+##############################
+#                            #
+#      INPUT FUNCTIONS       #
+#                            #
+##############################
+
+# left click on the (x,y) coordinates
+# left clicking reveals non flagged cells
+def leftClick(x, y):
+    ...
+
+# |                          |
+# |  ADD THIS FUNCTION HERE  |
+# V                          V
+
+# right click on the (x, y) coordinates
+# right clicking toggles flag on non-revealed cells      
+def rightClick(x, y):
+    # convert the mouse position to cell indices
+    cx, cy = int(x/CELL_SIZE), int(y/CELL_SIZE)
+    # return if either index is out of bounds  
+    if not (0&lt;=cx&lt;NX and 0&lt;=cy&lt;NY):
+        return
+    
+    # toggle the flag for cells that get right clicked
+    cell = cells[cx][cy]
+    cell.flagged = not cell.flagged
+
+# Gets user input 
+def getInput(event):
+    # when left/right clicking, get mouse position, and call the appropriate function
+    if event.type == pygame.MOUSEBUTTONDOWN:
+        # get mouse positions and which buttons are active
+        mousex, mousey = pygame.mouse.get_pos()
+        mouse_buttons = pygame.mouse.get_pressed()
+        if mouse_buttons[0]:
+            leftClick(mousex, mousey)
+        elif mouse_buttons[2]:              # &lt;----- ADD THIS LINE HERE
+            rightClick(mousex, mousey)      # &lt;----- ADD THIS LINE HERE
+</code></pre>
+<p>Now when you right click, the cell you clicked on will have it&#39;s flag turned on/off!</p>
+<aside class="warning"><p> Technically, with this code you can toggle flags on revealed cells as well, but becuase of how we set up the rendering code, you just can&#39;t see the flag on revealed cells.</p>
+</aside>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Losing" duration="0">
+        <p>How do you know if you are a loser?</p>
+<ol type="1">
+<li>If you have no friends (looking at all of you)</li>
+<li>If you left click on a bomb</li>
+</ol>
+<p>We&#39;re only going to add code for the second one today. Let&#39;s start by adding a variable to track whether the game has ended in <code>Functions.py</code>.</p>
+<pre><code language="language-Python" class="language-Python">&#39;&#39;&#39; Functions.py &#39;&#39;&#39;
+import pygame, math, random
+#import cell class
+from Cell import *
+
+# turn on pygame
+pygame.init()
+
+# window dimensions
+WIDTH, HEIGHT = 600, 600
+
+# minesweeper grid dimensions
+NX, NY = 10, 10
+# side length of each cell
+CELL_SIZE = WIDTH / NX
+# array of all cells
+cells = [[Cell(False,0,0) for i in range(NY)] for j in range(NX)]
+
+# whether or not the game has ended
+game_over = False                   # &lt;----- ADD THIS LINE HERE
+
+# Create the window and fonts
+WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
+...
+</code></pre>
+<p>Now go to <code>leftClick</code>. If you reveal a bomb cell, we&#39;ll set <code>game_over</code> to <code>True</code>:</p>
+<pre><code language="language-Python" class="language-Python">...
+##############################
+#                            #
+#      INPUT FUNCTIONS       #
+#                            #
+##############################
+
+# left click on the (x,y) coordinates
+# left clicking reveals non flagged cells
+def leftClick(x, y):
+
+    global game_over                # &lt;----- ADD THIS LINE HERE
+    
+    # convert the mouse position to cell indices
+    cx, cy = int(x/CELL_SIZE), int(y/CELL_SIZE)
+    # return if either index is out of bounds  
+    if not (0&lt;=cx&lt;NX and 0&lt;=cy&lt;NY):
+        return
+    
+    # reveal cells that get clicked, don&#39;t reveal flagged cells
+    cell = cells[cx][cy]
+    if not cell.flagged:
+        cell.reveal()
+        if cell.isBomb():               # &lt;----- ADD THIS LINE HERE
+            game_over = True            # &lt;----- ADD THIS LINE HERE
+...
+</code></pre>
+<h2 is-upgraded>Rendering Game Over</h2>
+<p>We need to tell players that they lost, so that everyone knows full well how much of a loser they are. We&#39;ll do this by rending text to the screen when the game is over</p>
+<p>Add this code to <code>render</code>:</p>
+<pre><code language="language-Python" class="language-Python">...
+##############################
+#                            #
+#    RENDERING FUNCTIONS     #
+#                            #
+##############################
+
+def renderCells():
+    ...            
+def renderGrid():
+    ...
+
+# This one is just to make life easier 
+def render():
+    # call rendering helper functions 
+    renderCells()
+    renderGrid()
+
+    # |                      |
+    # |  ADD THIS CODE HERE  |
+    # V                      V
+    
+    # if the game has ended, render the victory or loss text
+    if game_over:
+        txt = FONT.render(&#34;You Lose&#34;, True, &#34;red&#34;)
+        txt_rect = txt.get_rect(center=(WIDTH/2,HEIGHT/2))
+        WINDOW.blit(txt, txt_rect)
+</code></pre>
+<p>Now when you click on a bomb, this will happen:</p>
+<p class="image-container"><img alt="Haha noob you lose" src="img\\11faf7172d81acf6.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Winning" duration="0">
+        <p>How do you knoww if you are a winner?</p>
+<ol type="1">
+<li>If you live a healthy life with an overall feeling of satisfaction</li>
+<li>You flag all the bombs on a minesweeper board</li>
+</ol>
+<p>We&#39;re only going to cover that second one today, and we&#39;re going to do it by counting the number of bombs on the board, and decrementing that counter when the player correctly flags a bomb. They win when the counter is 0 (there are no unflagged bombs).</p>
+<p>Add this variable in <code>Fucntions.py</code> to track the number of bombs:</p>
+<pre><code language="language-Python" class="language-Python">&#39;&#39;&#39; Functions.py &#39;&#39;&#39;
+import pygame, math, random
+#import cell class
+from Cell import *
+
+# turn on pygame
+pygame.init()
+
+# window dimensions
+WIDTH, HEIGHT = 600, 600
+
+# minesweeper grid dimensions
+NX, NY = 10, 10
+# side length of each cell
+CELL_SIZE = WIDTH / NX
+# array of all cells
+cells = [[Cell(False,0,0) for i in range(NY)] for j in range(NX)]
+
+# The number of unflagged bombs
+numBombs = 0                            # &lt;----- ADD THIS LINE HERE
+# whether or not the game has ended
+game_over = False
+
+# Create the window and fonts
+WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
+</code></pre>
+<h2 is-upgraded>Counting bombs</h2>
+<p>To count the number of bombs on the board, we&#39;re just going to change the <code>rollForBomb</code> function, to increment the counter every time it returns true, like so:</p>
+<pre><code language="language-Python" class="language-Python">##############################
+#                            #
+#      GRID MANAGEMENT       #
+#                            #
+##############################
+
+def breakBoard():
+    ...
+
+def rollForBomb():
+
+    global numBombs             # &lt;----- ADD THIS LINE HERE
+
+    # If the bomb roll is successful, return true
+    if random.uniform(0, 1) &lt; 0.25:
+
+        numBombs += 1           # &lt;----- ADD THIS LINE HERE
+        return True
+    return False
+...
+</code></pre>
+<h2 is-upgraded>Detecting a W</h2>
+<p>When we right click to toggle flag, we should decrement the counter when flagging a bomb. So, in the <code>rightClick</code> function, after we decrement the counter, if the counter is <code>0</code> we&#39;ll set <code>game_over</code> to <code>True</code></p>
+<aside class="warning"><p> Note: In <code>rightClick</code> we should also increment the counter if a flag was removed from a bomb cell</p>
+</aside>
+<p>Make these changes in the <code>rightClick</code> function:</p>
+<pre><code language="language-Python" class="language-Python">##############################
+#                            #
+#      INPUT FUNCTIONS       #
+#                            #
+##############################
+
+def leftClick(x, y):
+    ...
+        
+# right click on the (x, y) coordinates
+# right clicking toggles flag on non-revealed cells      
+def rightClick(x, y):
+
+    global game_over, numBombs                      # &lt;----- ADD THIS LINE HERE
+
+    # convert the mouse position to cell indices
+    cx, cy = int(x/CELL_SIZE), int(y/CELL_SIZE)
+    # return if either index is out of bounds  
+    if not (0&lt;=cx&lt;NX and 0&lt;=cy&lt;NY):
+        return
+    
+    # toggle the flag for cells that get right clicked
+    cell = cells[cx][cy]
+    cell.flagged = not cell.flagged
+
+    # |                      |
+    # |  ADD THIS CODE HERE  |
+    # V                      V
+
+    if cell.isBomb():
+        # change bomb count when a bomb is toggled 
+        if not cell.flagged:
+            numBombs += 1
+        else:
+            numBombs -= 1
+        # win when there are no bombs left
+        if numBombs == 0:
+            game_over = True
+...
+</code></pre>
+<h2 is-upgraded>Rendering the W</h2>
+<p>Finally, so that we don&#39;t render &#34;You Lose&#34; when you actually win, make this change to <code>render</code>:</p>
+<pre><code language="language-Python" class="language-Python">##############################
+#                            #
+#    RENDERING FUNCTIONS     #
+#                            #
+##############################
+
+def renderCells():
+    ...
+def renderGrid():
+    ...
+
+# This one is just to make life easier 
+def render():
+    # call rendering helper functions 
+    renderCells()
+    renderGrid()
+    
+    # if the game has ended, render the victory or loss text
+    if game_over:
+        if numBombs != 0:       # &lt;----- ADD THIS LINE HERE
+
+            # v  INDENT THESE THREE LINES v
+            txt = FONT.render(&#34;You Lose&#34;, True, &#34;red&#34;)
+            txt_rect = txt.get_rect(center=(WIDTH/2,HEIGHT/2))
+            WINDOW.blit(txt, txt_rect)
+        
+        # |                      |
+        # |  ADD THIS CODE HERE  |
+        # V                      V
+
+        else:
+            txt = FONT.render(&#34;You Win&#34;, True, &#34;green&#34;)
+            txt_rect = txt.get_rect(center=(WIDTH/2,HEIGHT/2))
+            WINDOW.blit(txt, txt_rect)
+
+</code></pre>
+<aside class="special"><p> Now when you flag all the bombs, it&#39;ll say you win the game!!! :)</p>
+</aside>
+<p class="image-container"><img alt="number 1 victory royale" src="img\\80af5a085803aec8.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Breaking the Board" duration="0">
+        <p>Right now, the game is really hard, because the first few cells you click are pretty much random, and they could very well be a bomb. We should start the game by revealing a cell that has zero surrounding bombs, so the player doesn&#39;t have to guess for their first few cells.</p>
+<p>We&#39;re going to do this by editing <code>breakBoard</code> to reveal a cell that has zero surrounding bombs, lise so:</p>
+<pre><code language="language-Python" class="language-Python">&#39;&#39;&#39; Functions.py &#39;&#39;&#39;
+##############################
+#                            #
+#      GRID MANAGEMENT       #
+#                            #
+##############################
+
+def breakBoard():
+    # indices of the cell that will be revealed
+    bx, by = -1, -1                     # &lt;----- ADD THIS LINE HERE
+
+    # iterate through each cell, and update the cell&#39;s surrounding count
+    # if the number of surrounding bombs is 0, update bx and by
+    for x in range(NX):
+        for y in range(NY):
+            cells[x][y].countSurrounding()
+            if cells[x][y].surrounding_bombs == 0:  # &lt;----- ADD THIS LINE HERE
+                bx, by = x, y                       # &lt;----- ADD THIS LINE HERE
+
+    # |                      |
+    # |  ADD THIS CODE HERE  |
+    # V                      V
+
+    # if a cell to reveal was found, reveal it and return true
+    if bx&gt;=0 and by&gt;=0:
+        cells[bx][by].reveal()
+        return True
+    # return failure
+    return False
+</code></pre>
+<h2 is-upgraded>Error Handling</h2>
+<aside class="warning"><p> Because grid generation is random, it is possible for there to be NO cells with zero surrounding bombs. As you can see above, in this case we do not reveal the cell, and instead return False. If this happens, we should regenerate the board, which hopefully will have a zero cell.</p>
+</aside>
+<p>Add this code to <code>createGrid</code>:</p>
+<pre><code language="language-Python" class="language-Python">##############################
+#                            #
+#      GRID MANAGEMENT       #
+#                            #
+##############################
+
+def breakBoard():
+    ...
+def rollForBomb():
+    ...
+
+def createGrid():
+    global cells
+
+    # re-initialise the grid with new cells
+    cells = [[Cell(rollForBomb(), j, i) for i in range(NY)] for j in range(NX)]
+    
+    if not breakBoard():        # &lt;----- MODIFY THIS LINE HERE
+        createGrid()            # &lt;----- ADD THIS LINE HERE
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Getting Better Colours (extra)" duration="0">
+        <p>All the numbers right now are pitch black. It would be nicer if they had different colours based on what number they are. Let&#39;s start by making a function to determine colour based on the number of surrounding bombs.</p>
+<p>Go to <code>Cell.py</code>, and add this function before Cell definition:</p>
+<pre><code language="language-Python" class="language-Python">&#39;&#39;&#39; Cell.py &#39;&#39;&#39;
+import pygame
+
+# Returns a colour based on the number of bombs surrounding a cell
+def getColor(numSurroundingBombs):
+    match (numSurroundingBombs):
+        case 1: 
+            return (50,50,255)
+        case 2:
+            return (50,255,50)
+        case 3: 
+            return (255,50,50)
+        case 4:
+            return (170,0,255)
+        case 5: 
+            return (255,255,0)
+        case 6:
+            return (255,150,0)
+        case 7: 
+            return (20,20,20)
+        case 8:
+            return (30,0,0)
+    return (0,0,0)
+
+# A single cell on the minsweeper board
+class Cell:
+    ...
+</code></pre>
+<aside class="warning"><p> These colours were chosen arbitrarily, you can make the function return whatever you like</p>
+</aside>
+<h2 is-upgraded>Calling the new function</h2>
+<p>Now go to the cell&#39;s <code>render</code> function. We&#39;re going to change the line that makes the number black, and make it call this new function for a colour instead.</p>
+<p>Make this change:</p>
+<pre><code language="language-Python" class="language-Python">...
+class Cell:
+    def __init__(self, isBomb, x, y):
+        ...
+    def isBomb(self):
+        ...
+    def surrounding(self):
+        ...
+    def countSurrounding(self):
+        ...
+    def reveal(self):
+        ...
+                    
+    # Renders the cell onto the screen
+    def render(self):
+        # get required variables from functions
+        from Functions import WINDOW, FONT, CELL_SIZE, FLAG, BOMB
+        # Set up a rect to represent the cell&#39;s space on the window
+        rect = pygame.Rect(self.x*CELL_SIZE, self.y*CELL_SIZE, CELL_SIZE, CELL_SIZE)
+        
+        # If the cells is revealed, show the number of surrounding bombs, or,
+        # if the cell IS a bomb, render the bomb image
+        if self.revealed:
+            # render cell background
+            pygame.draw.rect(WINDOW, (170,170,170), rect)
+            
+            # render bomb image if the cell is a bomb
+            if self.isBomb():
+                WINDOW.blit(BOMB, rect)
+            # Render a number for the surrounding bomb count
+            elif self.surrounding_bombs &gt; 0:
+
+                # |                                         |
+                # |  CHANGE THIS LINE TO CALL THE FUNCTION  |
+                # V                                         V
+
+                num = FONT.render(str(self.surrounding_bombs), True, getColor(self.surrounding_bombs))
+
+                num_rect = num.get_rect(center=(rect.x+rect.w/2,rect.y+rect.h/2))
+                WINDOW.blit(num, num_rect)
+
+        # If the cell ISN&#39;T revealed, just render the cell backgorund
+        # if the cell has a flag, render the flag image
+        else:
+            pygame.draw.rect(WINDOW, (90,90,90), rect)
+            if self.flagged:
+                WINDOW.blit(FLAG, rect)
+</code></pre>
+<p>Now the game looks a LOT nicer :)</p>
+<p class="image-container"><img alt="WOW so colourful" src="img\\61695d44d4d79400.PNG"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Revealing All Cells (extra)" duration="0">
+        <p>When you lose, we should make it clear why you&#39;re such a loser. We should reveal all the cells so that you know what you did wrong.</p>
+<p>We won&#39;t reveal cells that were correctly flagged, so that you also know what you did right.</p>
+<p>Add this function to <code>Functions.py</code>:</p>
+<pre><code language="language-Python" class="language-Python">##############################
+#                            #
+#      GRID MANAGEMENT       #
+#                            #
+##############################
+
+def breakBoard():
+    ...
+def rollForBomb():
+    ...
+def createGrid():
+    ...
+
+# reveal all cells in the grid. do not reveal bombs that have been correctly flagged
+def revealAll():
+    for row in cells:
+        for cell in row:
+            if not cell.revealed:
+                if not (cell.isBomb() and cell.flagged):
+                    cell.reveal()
+</code></pre>
+<p>Now, we&#39;ll call this function in both places that <code>game_over</code> gets set to <code>True</code>.</p>
+<p>Call the function in <code>leftClick</code> and <code>rightClick</code>, like so:</p>
+<pre><code language="language-Python" class="language-Python">##############################
+#                            #
+#      INPUT FUNCTIONS       #
+#                            #
+##############################
+
+# left click on the (x,y) coordinates
+# left clicking reveals non flagged cells
+def leftClick(x, y):
+    global game_over
+    
+    # convert the mouse position to cell indices
+    cx, cy = int(x/CELL_SIZE), int(y/CELL_SIZE)
+    # return if either index is out of bounds  
+    if not (0&lt;=cx&lt;NX and 0&lt;=cy&lt;NY):
+        return
+    
+    # reveal cells that get clicked, don&#39;t reveal flagged cells
+    cell = cells[cx][cy]
+    if not cell.flagged:
+        cell.reveal()
+        if cell.isBomb():
+            revealAll()             # &lt;----- ADD THIS LINE HERE
+            game_over = True
+        
+# right click on the (x, y) coordinates
+# right clicking toggles flag on non-revealed cells      
+def rightClick(x, y):
+    global game_over, numBombs
+    # convert the mouse position to cell indices
+    cx, cy = int(x/CELL_SIZE), int(y/CELL_SIZE)
+    # return if either index is out of bounds  
+    if not (0&lt;=cx&lt;NX and 0&lt;=cy&lt;NY):
+        return
+    
+    # toggle the flag for cells that get right clicked
+    cell = cells[cx][cy]
+    cell.flagged = not cell.flagged
+    
+    if cell.isBomb():
+        # change bomb count when a bomb is toggled 
+        if not cell.flagged:
+            numBombs += 1
+        else:
+            numBombs -= 1
+        # win when there are no bombs left
+        if numBombs == 0:
+            revealAll()             # &lt;----- ADD THIS LINE HERE
+            game_over = True
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Resetting the Game (extra)" duration="0">
+        <p>It&#39;s kind of annoying how we have to close the game and relaunch it to reset. Let&#39;s make it so that the game resets when you press the spacebar.</p>
+<aside class="special"><p> &#34;Resetting&#34; here basically just means calling <code>createGrid</code> to recreate the grid, then setting <code>game_over</code> back to <code>False</code>.</p>
+</aside>
+<p>Add this code to <code>getInput</code>:</p>
+<pre><code language="language-Python" class="language-Python">##############################
+#                            #
+#      INPUT FUNCTIONS       #
+#                            #
+##############################
+
+def leftClick(x, y):
+    ...     
+def rightClick(x, y):
+    ...
+
+# Gets user input 
+def getInput(event):
+
+    global game_over        # &lt;----- ADD THIS LINE HERE
+
+    # when left/right clicking, get mouse position, and call the appropriate function
+    if event.type == pygame.MOUSEBUTTONDOWN:
+        # get mouse positions and which buttons are active
+        mousex, mousey = pygame.mouse.get_pos()
+        mouse_buttons = pygame.mouse.get_pressed()
+        if mouse_buttons[0]:
+            leftClick(mousex, mousey)
+        elif mouse_buttons[2]:
+            rightClick(mousex, mousey)
+
+    # |                      |
+    # |  ADD THIS CODE HERE  |
+    # V                      V
+
+    # If the player presses space, reset the game by creating a new grid
+    elif event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_SPACE:
+            createGrid()
+            game_over = False
+</code></pre>
+<p>Now when you press space, the game resets!</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="YAAAYYYY WE HAVE MINESWEEPER!!!!!" duration="0">
+        <p class="image-container"><img alt="Solly Wave" src="img\\44f356558033e250.gif"></p>
+<p>Now you have working minesweeper, only after 22 CodeLab pages! So brief!</p>
+<p>This is certainly one of the longest workshop projects so thank you for making it to the end, hopefully you learned something about game dev today!</p>
+<p>Now. Look at Solly here. He is so so hungry because we have no money to feed him. Only YOU can make a change, by checking in to the event on bullsconnect.</p>
+
+
+      </google-codelab-step>
+    
+  </google-codelab>
+
+  <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+</html>
