@@ -12,3 +12,4 @@ GameDevClubUSF.github.io/`Insert Codelab Name`
 * [2D Physics Codelab](https://gamedevclubusf.github.io/Physics2DCodeLab/)
 * [First Person Player Controller Codelab](https://gamedevclubusf.github.io/FirstPersonPlayerController/)
 * [Minesweeper](https://gamedevclubusf.github.io/Minesweeper/)
+* [Godot First Person Shooter](https://gamedevclubusf.github.io/GodotFPS/#0)
