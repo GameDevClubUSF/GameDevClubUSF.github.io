@@ -1,0 +1,309 @@
+
+<!doctype html>
+
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>First Person Shooter with Godot</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+  <google-codelab codelab-gaid=""
+                  codelab-ga4id=""
+                  id="GodotFPS"
+                  title="First Person Shooter with Godot"
+                  environment="web"
+                  feedback-link="https://github.com/SolaceDev/solace-dev-codelabs/blob/master/markdown/GodotFPS">
+    
+      <google-codelab-step label="What you&#39;ll learn: Overview" duration="5">
+        <h2 is-upgraded>Table of Contents</h2>
+<ol type="1">
+<li>Overview</li>
+<li>Installing Godot, Importing or Continuing our Player Controller</li>
+<li>Quick review and Importing assets</li>
+<li>Adding Crosshair</li>
+<li>Create Gun Scene</li>
+<li>Create bullet</li>
+<li>Shooting gun</li>
+<li>Correcting the shooting position</li>
+<li>Adding objects to shoot</li>
+<li>FINISH!1!!11!</li>
+</ol>
+<h2 is-upgraded>Finished Project</h2>
+<p class="image-container"><img alt="Soly Image Caption" src="img\\6efc32ce39da0250.gif"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Installing Godot and Importing or Continuing Player Controller" duration="5">
+        <h2 is-upgraded>Download Godot</h2>
+<p><a href="https://godotengine.org/download/" target="_blank">Click Here</a> to Dowload Godot</p>
+<h2 is-upgraded>Copy of First Person Player Controller project</h2>
+<p><a href="./FirstPersonPlayerController.zip" target="_blank">Click Here</a> to Dowload our First Person Player Controller</p>
+<h2 is-upgraded>Run the correct Program</h2>
+<p class="image-container"><img alt="setup godot" src="img\\1b53f8f915b0aed9.jpeg"></p>
+<h2 is-upgraded>Import new project</h2>
+<p class="image-container"><img alt="importing project" src="img\\893d23fc1f691410.jpg"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Quick review and Importing assets" duration="5">
+        <h2 is-upgraded>The Player Controller</h2>
+<p>Basic Player Controller, allows user to move around and freelook</p>
+<h2 is-upgraded>Import new assets for shooter</h2>
+<p><a href="./Assets.zip" target="_blank">Click here</a> to download assets</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Adding Crosshair" duration="3">
+        <h2 is-upgraded>Create new TextureRect, anchor center, and apply texture</h2>
+<p class="image-container"><img alt="Crosshair" src="img\\8106b7e7d50fe543.jpg"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Create Gun Scene" duration="8">
+        <h2 is-upgraded>Create new Inhereted Scene from Rifle.fbx</h2>
+<p class="image-container"><img alt="Create Gun 1" src="img\\a76d1d60f86e44a9.jpg"></p>
+<h2 is-upgraded>Resize Rifle and Make sure front of the gun is facing -Z</h2>
+<p class="image-container"><img alt="Create Gun 2" src="img\\579b9908f2f11410.jpg"></p>
+<h2 is-upgraded>Create a new Material (#434343)</h2>
+<p class="image-container"><img alt="Create Gun 3" src="img\\ea61577c204725ce.jpg"></p>
+<h2 is-upgraded>Add Raycast at the end of the barrel and make the Target Position (0,0,-1) [DO NOT ROTATE, change the target pos]</h2>
+<p class="image-container"><img alt="Create Gun 4" src="img\\c618de9b02c72e5.jpg"></p>
+<h2 is-upgraded>Add a new AnimationPlayer Node and create a new animation name it ‘Shoot&#39;</h2>
+<p class="image-container"><img alt="Create Gun 5" src="img\\36c62effcb9d0de.jpg"></p>
+<h2 is-upgraded>Add Mes the mesh&#39;s Position property into the animation, change animation duration to 0.1, and Snap to 0.01 seconds</h2>
+<p class="image-container"><img alt="Create Gun 6" src="img\\d71777c2627c7e5b.jpg"></p>
+<h2 is-upgraded>Insert Keyframes</h2>
+<p class="image-container"><img alt="Create Gun 7" src="img\\cd53d3fc5dc2a380.jpg"></p>
+<h2 is-upgraded>Change the middle keyframe, move the position in the positive Z direction by 0.1</h2>
+<p class="image-container"><img alt="Create Gun 8" src="img\\3c1622d128547b7c.jpg"></p>
+<h2 is-upgraded>Link the Gun/Rifle Scene (not .fbx) to the Player Scene</h2>
+<p class="image-container"><img alt="Create Gun 9" src="img\\cd6506e4def54cc.jpg"></p>
+<h2 is-upgraded>Move the Gun/Rifle Scene as the child of the Camera3D Node</h2>
+<p class="image-container"><img alt="Create Gun 10" src="img\\fcdbddb52e07fec2.jpg"></p>
+<h2 is-upgraded>CODE make the gun functional</h2>
+<p>At the top of the player script with the other variables<br> make a refernce to the rifle and the raycast</p>
+<pre><code>extends CharacterBody3D
+
+
+const SPEED = 5.0
+const JUMP_VELOCITY = 6.5
+const MOUSE_SENSETIVITY = 0.1 
+
+# ADDED CODE
+@onready var gun_anim = $Camera3D/Rifle/AnimationPlayer		
+@onready var gun_barrel = $Camera3D/Rifle/RayCast3D
+</code></pre>
+<h2 is-upgraded>Inside _physics_process function add this code</h2>
+<pre><code>	## Handle Shooting
+	if Input.is_action_pressed(&#34;shoot&#34;):
+		if !gun_anim.is_playing():
+			gun_anim.play(&#34;Shoot&#34;)
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Create bullet" duration="9">
+        <h2 is-upgraded>Create a new 3D scene rename it bullet</h2>
+<p class="image-container"><img alt="CreatingBullet1" src="img\\ee4c16878846171b.jpg"></p>
+<h2 is-upgraded>Add a cube mesh to the scene</h2>
+<p class="image-container"><img alt="CreatingBullet1" src="img\\70a454ed9e633102.jpg"></p>
+<h2 is-upgraded>Add a new material to the cube, change the albedo and emission colors</h2>
+<p class="image-container"><img alt="CreatingBullet1" src="img\\98a59135009c934c.jpg"></p>
+<h2 is-upgraded>Change the scale of the cube to a more bullet like shape</h2>
+<p class="image-container"><img alt="CreatingBullet1" src="img\\c2c6f10dbaad7e49.jpg"></p>
+<h2 is-upgraded>Add RayCast3D and GPUParticles3D Node to the scene</h2>
+<p class="image-container"><img alt="CreatingBullet1" src="img\\cce779f2d954e0fe.jpg"></p>
+<h2 is-upgraded>Have the RayCast3D point towards -0.8 Z, and move it where the tip is barely in front of the shape</h2>
+<p class="image-container"><img alt="CreatingBullet1" src="img\\db5a34990058dc10.jpg"></p>
+<h2 is-upgraded>Hide all nodes except GPU Particle, Create a new cube particle</h2>
+<p class="image-container"><img alt="CreatingBullet1" src="img\\f4098274fd4f601c.jpg"></p>
+<h2 is-upgraded>Change the Albedo and Emission of the particle</h2>
+<p class="image-container"><img alt="CreatingBullet1" src="img\\cb651734e63a2b99.jpg"></p>
+<h2 is-upgraded>Create a new particle process</h2>
+<p class="image-container"><img alt="CreatingBullet1" src="img\\e8a084454e2ddd1.jpg"></p>
+<h2 is-upgraded>In Process Material, change the spawn properties</h2>
+<p class="image-container"><img alt="CreatingBullet1" src="img\\b3de7d43f1198bd.jpg"></p>
+<h2 is-upgraded>In Time, change the particle to One Shot and maximize explosiveness</h2>
+<p class="image-container"><img alt="CreatingBullet1" src="img\\f614c2c0e6d81e84.jpg"></p>
+<h2 is-upgraded>Create a new Bullet script</h2>
+<p class="image-container"><img alt="CreatingBullet1" src="img\\6d20274bde333cc9.jpg"></p>
+<h2 is-upgraded>Add a Timer Node to the bullet</h2>
+<p class="image-container"><img alt="CreatingBullet1" src="img\\d59a201f0e7f0d5b.jpg"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Shooting gun" duration="5">
+        <h2 is-upgraded>In the ‘player.gd&#39; script</h2>
+<p>At the top with the gun_anim and gun_barrel variables add two new variables</p>
+<pre><code>var bullet = load(&#34;res://Scenes/bullet.tscn&#34;)
+var instance
+
+@onready var gun_anim = $Camera3D/Rifle/AnimationPlayer		
+@onready var gun_barrel = $Camera3D/Rifle/RayCast3D
+</code></pre>
+<h3 is-upgraded>Inside the ‘_physics_process&#39;, Handle Shooting section</h3>
+<pre><code>	## Handle Shooting
+	if Input.is_action_pressed(&#34;shoot&#34;):
+		if !gun_anim.is_playing():
+			gun_anim.play(&#34;Shoot&#34;)
+			
+			instance = bullet.instantiate()
+			instance.position = gun_barrel.global_position
+			instance.transform.basis = gun_barrel.global_transform.basis
+			
+			get_parent().add_child(instance)
+</code></pre>
+<h2 is-upgraded>In the bullet.gd script</h2>
+<pre><code>extends Node3D
+
+const SPEED = 40.0
+
+@onready var mesh = $MeshInstance3D
+@onready var ray = $RayCast3D
+
+@onready var particle = $GPUParticles3D
+
+# Called every frame. &#39;delta&#39; is the elapsed time since the previous frame.
+func _process(delta: float) -&gt; void:
+	position += transform.basis * Vector3(0,0, -SPEED) * delta
+	
+	if ray.is_colliding():
+		mesh.visible = false
+		particle.emitting = true
+		
+		await get_tree().create_timer(1.0).timeout
+		queue_free()
+
+
+func _on_timer_timeout() -&gt; void:
+	queue_free()
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Correcting the shooting position" duration="8">
+        <h2 is-upgraded>Add a new RayCast3D to the Player</h2>
+<p class="image-container"><img alt="Add ray to player" src="img\\1a943170ab979617.jpg"></p>
+<h2 is-upgraded>Inside ‘player.gd&#39; script</h2>
+<h3 is-upgraded>Add a new variable referencing the Player&#39;s ray</h3>
+<pre><code>var bullet = load(&#34;res://Scenes/bullet.tscn&#34;)
+var instance
+@onready var gun_anim = $Camera3D/Rifle/AnimationPlayer		
+@onready var gun_barrel = $Camera3D/Rifle/barrel
+
+@onready var player_ray = $RayCast3D
+</code></pre>
+<h2 is-upgraded>Inside ‘_physics_process&#39; in shooting section</h2>
+<p>Replace the <code>instance.transform.basis = gun_barrel.global_transform.basis</code> piece of code with</p>
+<pre><code>	var hit_point = player_ray.global_transform.origin + (-player_ray.global_transform.basis.z * 40.0)
+	var dir = (hit_point - gun_barrel.global_position).normalized()
+	
+	if player_ray.is_colliding():
+		hit_point = player_ray.get_collision_point()
+		dir = (hit_point - gun_barrel.global_position).normalized()
+		
+	instance.transform.basis = Basis().looking_at(dir, Vector3.UP)
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Adding objects to shoot" duration="5">
+        <h2 is-upgraded>Add a new RigidBody3D Object with mesh and collider</h2>
+<p class="image-container"><img alt="object to shoot" src="img\\5dd7a19cfab8cc45.jpg"></p>
+<h2 is-upgraded>Give the mesh and collider a box mesh and collider</h2>
+<p class="image-container"><img alt="object to shoot" src="img\\c551b50c5738b85f.jpg"><img alt="object to shoot" src="img\\b443c34a1664a359.jpg"></p>
+<h2 is-upgraded>Inside ‘bullet.gd&#39; _process function add the new code</h2>
+<pre><code>func _process(delta: float) -&gt; void:
+	position += transform.basis * Vector3(0,0, -SPEED) * delta
+	
+	if ray.is_colliding():
+		mesh.visible = false
+		particle.emitting = true
+		
+		## NEW CODE ADDED HERE
+		var collider = ray.get_collider()
+		if collider is RigidBody3D:
+			print(&#34;Hit RigidBody3D&#34;)
+			collider.apply_impulse((transform.basis * Vector3(0, 0, -1)).normalized() * 3)
+        #elif collider is Enemy:
+		#	collider.takeDmg(1)
+		### NEW CODE END
+		
+		await get_tree().create_timer(1.0).timeout
+		queue_free()
+</code></pre>
+<h2 is-upgraded>Adding a simple enemy</h2>
+<h3 is-upgraded>Create a new Scene with CharacterBody3D as the base node</h3>
+<p class="image-container"><img alt="object to shoot" src="img\\1283b58d0477d6d6.jpg"></p>
+<h3 is-upgraded>Add mesh and collider to the CharacterBody3D and make the shape be capsule on both</h3>
+<p class="image-container"><img alt="object to shoot" src="img\\d971afa30298529e.jpg"><img alt="object to shoot" src="img\\bcf690bd95aaa3f2.jpg"></p>
+<h3 is-upgraded>Create a new enemy.gd script</h3>
+<p class="image-container"><img alt="object to shoot" src="img\\34014a85438c84d8.jpg"></p>
+<h2 is-upgraded>Code for the simple enemy</h2>
+<pre><code>class_name Enemy
+extends CharacterBody3D
+
+var currentHP = 50
+
+func takeDmg(dmg: int) -&gt; void:
+	currentHP = currentHP -1
+	print(currentHP)
+
+	if currentHP &lt;= 0:
+		queue_free()
+</code></pre>
+<h2 is-upgraded>In the bullet.gd script uncomment the elif statement with the Enemy in it</h2>
+<p>The could should look like this</p>
+<pre><code>	var collider = ray.get_collider()
+	if collider is RigidBody3D:
+		print(&#34;Hit RigidBody3D&#34;)
+		collider.apply_impulse((transform.basis * Vector3(0, 0, -1)).normalized() * 3)
+	elif collider is Enemy:
+		collider.takeDmg(1)
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="FINISH!1!!1" duration="1">
+        <p>✅ Intro to Godot<br> ✅ Introduction to Game Engines<br> ❓ Checked in?!?</p>
+<p class="image-container"><img alt="Soly Image Caption" src="img\\44f356558033e250.gif"></p>
+<p>As you know this is Solly the seal. You may also have noticed that Solly is always waving alone at the end of very workshop, it is because he is single, a fate for those working for a Triple A company.</p>
+<p>A contributing fact to the fate of those working for a Triple A comanpy, is that they have 0 rizz when it comes to clothing. Look at Solly, other than the depression and mental instability you may have also noticed he is not wearing any clothes. This is because he is both broke and has no time to shop.</p>
+<p>So it&#39;s time to make a difference, help the make a difference; fight against destiny and break Solly out of the cycle. Check-in on BullsConnect to convice USF we are an impactful club and so they will provide us with funding so we can get Solly some rizz by buying him clothes.</p>
+
+
+      </google-codelab-step>
+    
+  </google-codelab>
+
+  <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+</html>
