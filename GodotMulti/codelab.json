@@ -1,0 +1,22 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2025-02-25T14:53:52-05:00",
+  "id": "BaseCodeLab",
+  "duration": 45,
+  "title": "Godot Multiplayer",
+  "summary": "Codelab for Godot Multiplayer project.",
+  "source": "BaseCodeLab.md",
+  "theme": "",
+  "status": [
+    "published"
+  ],
+  "category": null,
+  "tags": [
+    "web"
+  ],
+  "feedback": "https://github.com/SolaceDev/solace-dev-codelabs/blob/master/markdown/BaseCodeLab",
+  "url": "BaseCodeLab"
+}

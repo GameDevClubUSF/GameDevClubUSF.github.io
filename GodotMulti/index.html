@@ -1,0 +1,327 @@
+
+<!doctype html>
+
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>Godot Multiplayer</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+  <google-codelab codelab-gaid=""
+                  codelab-ga4id=""
+                  id="BaseCodeLab"
+                  title="Godot Multiplayer"
+                  environment="web"
+                  feedback-link="https://github.com/SolaceDev/solace-dev-codelabs/blob/master/markdown/BaseCodeLab">
+    
+      <google-codelab-step label="What you&#39;ll learn: Overview" duration="45">
+        <p>We&#39;ll be adding multiplayer to our previous FPS project! Through this, we&#39;ll learn a bit about how local networking and RPC calls work withing Godot.</p>
+<h2 is-upgraded>Table of Contents</h2>
+<ol type="1">
+<li>Setup Environment</li>
+<li>Create Lobby and Global Scenes</li>
+<li>Editing World Scene</li>
+<li>Editing Player Script and Making a Camera script</li>
+<li>Test it out!</li>
+</ol>
+<h2 is-upgraded>Image of final product</h2>
+<p class="image-container"><img alt="Cool test!" src="img\\8cdd0bba49360237.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Setup Environment" duration="0">
+        <h2 is-upgraded>Godot Version</h2>
+<p>We will be using Godot version 4.3 for this project. Please make sure to have that version if you don&#39;t already.</p>
+<h2 is-upgraded>Computers</h2>
+<p>For this feature, we will be using Godot&#39;s mutiple instances feature to test multiplayer. However if you want a more realistic test, you can also use a secondary computer and run the project on both computers. Just be sure to have both computers on the same router connection.</p>
+<h2 is-upgraded>Project Files</h2>
+<p>If you missed the previous workshops, no worries! Here&#39;s the project file for where we left off: <a href="https://gamedevclubusf.github.io/GodotMulti/proj/Multi_base.zip" target="_blank">Multi_base.zip</a></p>
+<p>You can import the project by unzipping the files to a new folder, then clicking the &#34;Import&#34; button on the Godot Project Manager screen on boot.</p>
+<p>Once you have the project open in Godot V4.3, we are ready to start!</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Create Lobby and Global Scenes" duration="0">
+        <p>First things first, we need to make a new lobby scene to decide who will be the host and who will be a peer.</p>
+<p>Simply make a new scene with the node type &#34;User Interface&#34;, then we will add a few nodes:</p>
+<ul>
+<li>3 Buttons (Host, Join, StartGame)</li>
+<li>2 LineEdit (Name and IP input)</li>
+<li>2 Labels</li>
+</ul>
+<p>Then, we can add the script to the main Lobby node:</p>
+<pre><code language="language-GDScript" class="language-GDScript">extends Control
+
+@export var address = &#34;127.0.0.1&#34;
+@export var port = 8910
+
+var peer
+
+func _ready() -&gt; void:
+	multiplayer.peer_connected.connect(PlayerConnected)
+	multiplayer.peer_disconnected.connect(PlayerDisconnected)
+	multiplayer.connected_to_server.connect(ConnectedToServer)
+	multiplayer.connection_failed.connect(ConnectionFailed)
+
+
+func PlayerConnected(id):
+	print(&#34;Player Connected &#34; + str(id))
+
+func PlayerDisconnected(id):
+	print(&#34;Player Disconnected &#34; + str(id))
+	Global.Players.erase(id)
+	var players = get_tree().get_nodes_in_group(&#34;Player&#34;)
+	for i in players:
+		if i.name == str(id):
+			i.queue_free()
+
+func ConnectedToServer():
+	print(&#34;Connected to server!&#34;)
+	SendPlayerInformation.rpc_id(1, $NameInput.text, multiplayer.get_unique_id())
+
+func ConnectionFailed():
+	print(&#34;Connected to server!&#34;)
+
+@rpc(&#34;any_peer&#34;)
+func SendPlayerInformation(name, id):
+	if !Global.Players.has(id):
+		print(&#34;added: &#34; + str(id))
+		Global.Players[id] = {
+			&#34;name&#34;: name,
+			&#34;id&#34;: id
+		}
+
+	if multiplayer.is_server():
+		for i in Global.Players:
+			SendPlayerInformation.rpc(Global.Players[i].name, i)
+
+@rpc(&#34;any_peer&#34;, &#34;call_local&#34;)
+func StartGame():
+	var scene = load(&#34;res://Scenes/world.tscn&#34;).instantiate()
+	get_tree().root.add_child(scene)
+	self.hide()	
+
+func _on_host_button_down() -&gt; void:
+	peer = ENetMultiplayerPeer.new()
+	var error = peer.create_server(port, 2)
+	if error != OK:
+		print(&#34;Something went wrong! &#34; + error)
+		return
+	#peer.get_host().compress(ENetConnection.COMPRESS_RANGE_CODER)
+	multiplayer.set_multiplayer_peer(peer)
+	print(&#34;Waiting for Players!&#34;)
+	SendPlayerInformation($NameInput.text, multiplayer.get_unique_id())
+
+func _on_join_button_down() -&gt; void:
+	peer = ENetMultiplayerPeer.new()
+	if $IPInput.text != &#34;&#34;:
+		peer.create_client($IPInput.text, port)
+	else:
+		peer.create_client(address, port)
+	#peer.get_host().compress(ENetConnection.COMPRESS_RANGE_CODER)
+	multiplayer.set_multiplayer_peer(peer)
+
+
+func _on_start_game_button_down() -&gt; void:
+	for i in Global.Players:
+		print(&#34;Game Start:&#34;, Global.Players[i].id)
+	StartGame.rpc()
+</code></pre>
+<p>Be sure to propely connect the signals to their respective methods!</p>
+<p>We will also need to make a Global script with a simple script, and make it global in project settings.</p>
+<pre><code language="language-GDScript" class="language-GDScript">extends Node
+
+#Player Dict
+var Players = {}
+</code></pre>
+<h2 is-upgraded>Screenshots</h2>
+<p class="image-container"><img alt="Lobby UI Scene" src="img\\4fcb8828ec739ecd.png"></p>
+<p class="image-container"><img alt="Global Project Settings" src="img\\748e9155b56a970e.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Editing World Scene" duration="0">
+        <h2 is-upgraded>Adding Spawn Points</h2>
+<p>For the world scene, we will be working on adding spawn point support. First, we will create 2 different spawn points and put them in a scene group.</p>
+<p class="image-container"><img alt="Spawn Points in World" src="img\\7acda9e05efd840d.png"></p>
+<h2 is-upgraded>Creating a World Script</h2>
+<pre><code language="language-GDScript" class="language-GDScript">extends Node3D
+
+var PlayerScene = preload(&#34;res://Scenes/player.tscn&#34;)
+
+# Code for spawning players on the map using spawnpoints
+func _ready() -&gt; void:
+	var index = 0
+	for i in Global.Players:
+		print(Global.Players[i].id)
+		var currentPlayer = PlayerScene.instantiate()
+		currentPlayer.name = str(Global.Players[i].id)
+		var parent = self.get_parent()
+		parent.add_child(currentPlayer)
+		currentPlayer.find_child(&#34;Label3D&#34;).text = Global.Players[i].name
+		for spawn in get_tree().get_nodes_in_group(&#34;PlayerSpawnPoint&#34;):
+			if spawn.name == str(index):
+				currentPlayer.global_position = spawn.global_position
+			index += 1
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Editing Player Script and Making a Camera script" duration="0">
+        <h2 is-upgraded>MultiplayerSynchronizer</h2>
+<p>First, we need to add a MultiplayerSynchronizer node that will handle replication for movement and rotation.</p>
+<p class="image-container"><img alt="Spawn Points in World" src="img\\7acda9e05efd840d.png"></p>
+<h2 is-upgraded>Player Script Edits</h2>
+<p>Then we need to make a few player script changes to our player script. We mainly want to make it so that some actions happen on one client and others happen on all clients:</p>
+<pre><code language="language-GDScript" class="language-GDScript">extends CharacterBody3D
+
+const SPEED = 5.0
+const JUMP_VELOCITY = 4.5
+
+const MOUSE_SENSETIVITY = 0.1 
+
+
+var bullet = load(&#34;res://Scenes/bullet.tscn&#34;)
+var instance
+
+@onready var gun_anim = $Camera3D/Rifle/AnimationPlayer		
+@onready var gun_barrel = $Camera3D/Rifle/RayCast3D
+@onready var player_ray = $Camera3D/PlayerRay
+
+func _ready() -&gt; void:
+	#Set MultiplayerSynchronizer to the ID of the current client
+	$MultiplayerSynchronizer.set_multiplayer_authority(str(name).to_int())
+	
+	#To avoid having the player see themselves 
+	if $MultiplayerSynchronizer.get_multiplayer_authority() == multiplayer.get_unique_id():
+		($GDC_SallyToonShader2.find_child(&#34;rig&#34;).find_child(&#34;Skeleton3D&#34;).find_child(&#34;Body&#34;) as MeshInstance3D).set_layer_mask_value(1, false)
+		($GDC_SallyToonShader2.find_child(&#34;rig&#34;).find_child(&#34;Skeleton3D&#34;).find_child(&#34;Hair_HeadPhones&#34;) as MeshInstance3D).set_layer_mask_value(1, false)
+		($GDC_SallyToonShader2.find_child(&#34;rig&#34;).find_child(&#34;Skeleton3D&#34;).find_child(&#34;Head&#34;) as MeshInstance3D).set_layer_mask_value(1, false)
+	
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+func _process(delta: float) -&gt; void:
+	if Input.is_action_just_pressed(&#34;pause&#34;):
+		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+		else:
+			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+func _input(event: InputEvent) -&gt; void:
+	#if check for multiplayer
+	if $MultiplayerSynchronizer.get_multiplayer_authority() == multiplayer.get_unique_id():
+		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+			if event is InputEventMouseMotion and get_window().has_focus():
+				$Camera3D.rotation_degrees.x -= event.relative.y * MOUSE_SENSETIVITY
+				rotation_degrees.y -= event.relative.x * MOUSE_SENSETIVITY
+				$Camera3D.rotation_degrees.x = clamp($Camera3D.rotation_degrees.x, -90.0, 90.0)
+
+func _physics_process(delta: float) -&gt; void:
+	#if check for multiplayer
+	if $MultiplayerSynchronizer.get_multiplayer_authority() == multiplayer.get_unique_id():
+		# Add the gravity.
+		if not is_on_floor():
+			velocity += get_gravity() * delta
+
+		# Handle jump.
+		if Input.is_action_pressed(&#34;player_jump&#34;) and is_on_floor():
+			velocity.y = JUMP_VELOCITY
+
+		# Get the input direction and handle the movement/deceleration.
+		# As good practice, you should replace UI actions with custom gameplay actions.
+		var input_dir := Input.get_vector(&#34;player_left&#34;, &#34;player_right&#34;, &#34;player_forward&#34;, &#34;player_back&#34;)
+		var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+		if is_on_floor():
+			if direction:
+				velocity.x = direction.x * SPEED
+				velocity.z = direction.z * SPEED
+			else:
+				velocity.x = lerp(velocity.x, direction.x * SPEED, delta * 4.0)
+				velocity.z = lerp(velocity.z, direction.z * SPEED, delta * 4.0)
+		else:	
+			velocity.x = lerp(velocity.x, direction.x * SPEED, delta * 3.0)
+			velocity.z = lerp(velocity.z, direction.z * SPEED, delta * 3.0)
+
+		move_and_slide()
+		
+		# Handle Shooting
+		if Input.is_action_pressed(&#34;shoot&#34;):
+			fire.rpc()
+
+#RPC function for firing
+@rpc(&#34;any_peer&#34;, &#34;call_local&#34;)
+func fire():
+	if !gun_anim.is_playing():
+		gun_anim.play(&#34;Shoot&#34;)
+		
+		instance = bullet.instantiate()
+		instance.position = gun_barrel.global_position
+		
+		var hit_point = player_ray.global_transform.origin + (-player_ray.global_transform.basis.z * 40.0)
+		var dir = (hit_point - gun_barrel.global_position).normalized()
+		
+		if player_ray.is_colliding():
+			hit_point = player_ray.get_collision_point()
+			dir = (hit_point - gun_barrel.global_position).normalized()
+					
+		instance.transform.basis = Basis().looking_at(dir, Vector3.UP)
+			
+	get_parent().add_child(instance)
+</code></pre>
+<h2 is-upgraded>Camera3D Script</h2>
+<p>Since this is a 3D game, we will also make a small new script for our Camera3D:</p>
+<pre><code language="language-GDScript" class="language-GDScript">extends Camera3D
+
+# Called every frame. &#39;delta&#39; is the elapsed time since the previous frame.
+func _process(delta: float) -&gt; void:
+	if $&#34;../MultiplayerSynchronizer&#34;.get_multiplayer_authority() == multiplayer.get_unique_id(): make_current()
+	pass
+</code></pre>
+<h2 is-upgraded>Player Group and Name Label</h2>
+<p>We also want to add the player scene into a player group to help with disconnecting and a Label3D for the player name. <img alt="Player Group + Label3D" src="img\\8327bdb512cc8794.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Test it out!" duration="0">
+        <p>First, we want to set the lobby scene as the main instance. <img alt="Set as Main Scene" src="img\\fd1355a8a957bdbb.png"></p>
+<p>Under the debug tab, you will find a Customize run instances button. Press on that then enable &#34;Run Multiple Instances.&#34; <img alt="Mutiple Instances" src="img\\d69b15dc891432b9.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="End" duration="0">
+        <p>Congrats you did the thing woohoo!</p>
+<p>Have a soly as a reward: <img alt="Soly!" src="img\\44f356558033e250.gif"></p>
+
+
+      </google-codelab-step>
+    
+  </google-codelab>
+
+  <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+</html>
