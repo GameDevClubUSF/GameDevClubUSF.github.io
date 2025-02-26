@@ -79,10 +79,11 @@ func _ready() -&gt; void:
 	multiplayer.connected_to_server.connect(ConnectedToServer)
 	multiplayer.connection_failed.connect(ConnectionFailed)
 
-
+# this get called on the server and clients
 func PlayerConnected(id):
 	print(&#34;Player Connected &#34; + str(id))
 
+# this get called on the server and clients
 func PlayerDisconnected(id):
 	print(&#34;Player Disconnected &#34; + str(id))
 	Global.Players.erase(id)
@@ -91,12 +92,14 @@ func PlayerDisconnected(id):
 		if i.name == str(id):
 			i.queue_free()
 
+# called only from clients
 func ConnectedToServer():
 	print(&#34;Connected to server!&#34;)
 	SendPlayerInformation.rpc_id(1, $NameInput.text, multiplayer.get_unique_id())
 
+# called only from clients
 func ConnectionFailed():
-	print(&#34;Connected to server!&#34;)
+	print(&#34;Failed to connect to server!&#34;)
 
 @rpc(&#34;any_peer&#34;)
 func SendPlayerInformation(name, id):
@@ -115,7 +118,7 @@ func SendPlayerInformation(name, id):
 func StartGame():
 	var scene = load(&#34;res://Scenes/world.tscn&#34;).instantiate()
 	get_tree().root.add_child(scene)
-	self.hide()	
+	self.hide()
 
 func _on_host_button_down() -&gt; void:
 	peer = ENetMultiplayerPeer.new()
@@ -210,7 +213,7 @@ func _ready() -&gt; void:
 	#Set MultiplayerSynchronizer to the ID of the current client
 	$MultiplayerSynchronizer.set_multiplayer_authority(str(name).to_int())
 	
-	#To avoid having the player see themselves 
+	#To avoid having the player seeing themselves 
 	if $MultiplayerSynchronizer.get_multiplayer_authority() == multiplayer.get_unique_id():
 		($GDC_SallyToonShader2.find_child(&#34;rig&#34;).find_child(&#34;Skeleton3D&#34;).find_child(&#34;Body&#34;) as MeshInstance3D).set_layer_mask_value(1, false)
 		($GDC_SallyToonShader2.find_child(&#34;rig&#34;).find_child(&#34;Skeleton3D&#34;).find_child(&#34;Hair_HeadPhones&#34;) as MeshInstance3D).set_layer_mask_value(1, false)
@@ -310,7 +313,8 @@ func _process(delta: float) -&gt; void:
     
       <google-codelab-step label="End" duration="0">
         <p>Congrats you did the thing woohoo!</p>
-<p>Have a soly as a reward: <img alt="Soly!" src="img\\44f356558033e250.gif"></p>
+<p>Have a soly as a reward:</p>
+<p class="image-container"><img alt="Soly!" src="img\\44f356558033e250.gif"></p>
 
 
       </google-codelab-step>
